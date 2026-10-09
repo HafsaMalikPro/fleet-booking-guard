@@ -1,35 +1,17 @@
 import { cn } from '@/lib/cn';
 
-// Car-roof mark: a rounded roof band over two slanted wheel-arch feet (48×17 grid).
-const MARK_PATHS = [
-  'M5 7C5 3 8 .5 13 .5h25L42.5 7z',
-  'M3 10.5h16.2l-1.6 6.5H.4z',
-  'M29.2 10.5h14l3.4 6.5H30.8z',
-];
-
-// "1NOW" glyphs on a 20-unit cap height, drawn upright and slanted as a group.
-const WORDMARK_PATHS = [
-  'M1 4.5 5.5 0H10v20H5V6.8L1 8.8z',
-  'M13 0h5l6 11.5V0h5v20h-5l-6-11.5V20h-5z',
-  'M38 0h6.5a6 6 0 0 1 6 6v8a6 6 0 0 1-6 6H38a6 6 0 0 1-6-6V6a6 6 0 0 1 6-6zm1.5 5a2.5 2.5 0 0 0-2.5 2.5v5a2.5 2.5 0 0 0 2.5 2.5h3.5a2.5 2.5 0 0 0 2.5-2.5v-5A2.5 2.5 0 0 0 43 5z',
-  'M53 0h5l1.6 12.5L63.5 0h4.6l3.6 12.5L73.6 0h5l-4 20h-5.4L65.8 8.6 61.8 20h-5.2z',
-];
-
-function MarkPaths() {
-  return (
-    <>
-      {MARK_PATHS.map((d) => (
-        <path key={d} d={d} />
-      ))}
-    </>
-  );
-}
+// Paths from the official 1Now logo (framerusercontent.com/images/5pwMpBRQW9pb47knnj4IhtTvNE.svg),
+// split into the car-roof mark and the "1NOW" wordmark.
+const MARK_PATH =
+  'M103.26 73.01c-27.43 0-54.86 0-82.3-.01-.87 0-1.76-.07-2.58-.31-.96-.28-1.37-1.05-1.15-2.06.1-.44.22-.89.4-1.3 4.75-11.19 9.53-22.38 14.27-33.58 1.67-3.94 4.56-5.85 8.88-5.85 41.83.03 83.67.01 125.5.01 4.51 0 6.71 1.68 8.46 5.88 4.21 10.11 8.54 20.16 12.82 30.24.54 1.26 1.11 2.5 1.59 3.78.69 1.82-.05 2.98-2 3.17-.61.06-1.22.03-1.82.03zM19.5 113.1H3c-.56 0-1.14-.04-1.67-.2-1.13-.35-1.59-1.16-1.2-2.29.5-1.43 1.13-2.81 1.76-4.19 2.76-6.12 5.58-12.21 8.31-18.35 1.28-2.88 3.53-4.29 6.48-4.31 11.08-.09 22.15-.05 33.23-.03 1.93 0 2.63 1.17 1.83 3.09-1.62 3.88-3.33 7.74-5.01 11.6-1.51 3.48-3.03 6.95-4.53 10.44-1.22 2.85-3.29 4.29-6.43 4.26-5.43-.05-10.85-.01-16.28-.01Zm168.27 0c-5.26 0-10.54-.04-15.81.01-3.05.03-5.06-1.41-6.25-4.26-1.46-3.48-2.94-6.96-4.4-10.44-1.63-3.87-3.29-7.72-4.86-11.6-.78-1.93-.1-3.09 1.77-3.09 10.76-.02 21.52-.06 32.28.03 2.87.02 5.05 1.43 6.3 4.31 2.65 6.13 5.39 12.23 8.07 18.35.6 1.38 1.22 2.76 1.71 4.19.38 1.13-.07 1.94-1.16 2.29-.51.16-1.07.2-1.62.2h-16.03Z';
+const WORDMARK_PATH =
+  'M331.99 3.37l-5.5 31.07-11.01 62.13-5.5 30.89-37.99.18 15.62-88.23L264 51.66l-10.65-26.98L294 3.38h37.99Zm190.48 0-21.84 124.27h-53.79l-61.25-85.39-15.09 85.39h-37.99L354.53 3.37h49.88l64.26 89.65 15.8-89.65h37.99Zm182.14 62.14c-11.01 62.13-14.91 65.51-97.81 65.51s-85.74-3.37-74.74-65.51C542.89 3.37 547.15 0 629.87 0s85.57 3.37 74.74 65.51m-31.95-34.44h-96.57l-12.25 68.88h96.75zm278.71-27.7-66.22 124.27h-44.03L828.34 56.1l-37.99 71.54h-44.2L723.96 3.37h37.99l14.38 84.5 44.21-84.5h34.26l14.38 84.5 44.2-84.5z';
 
 /** The 1Now mark on its own. */
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 48 17" className={className} aria-hidden="true" fill="currentColor">
-      <MarkPaths />
+    <svg viewBox="0 29 207 85" className={className} aria-hidden="true" fill="currentColor">
+      <path d={MARK_PATH} />
     </svg>
   );
 }
@@ -38,20 +20,14 @@ export function LogoMark({ className }: { className?: string }) {
 export function Logo({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 127 22"
+      viewBox="0 0 951.37 131.01"
       className={cn('text-brand-500', className)}
       role="img"
       aria-label="1Now"
       fill="currentColor"
     >
-      <g transform="translate(0 4.8) scale(0.73)">
-        <MarkPaths />
-      </g>
-      <g transform="translate(47 1) skewX(-14)">
-        {WORDMARK_PATHS.map((d) => (
-          <path key={d} d={d} fillRule="evenodd" />
-        ))}
-      </g>
+      <path d={MARK_PATH} />
+      <path d={WORDMARK_PATH} />
     </svg>
   );
 }

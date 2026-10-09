@@ -64,7 +64,7 @@ I added two small things to the suggested structure:
 
 ## UI
 
-The look follows 1Now's site: their coral (`#F07C4E`), navy headings, pill buttons with an orange glow, and white cards with soft shadows. The 1NOW mark and wordmark are drawn as inline SVG (`presentation/components/LogoMark.tsx`), and the favicon is `app/icon.svg`. Under the hero, a "Fleet · next 14 days" card shows revenue protected, utilization, bookings in view and conflicts blocked. Utilization is computed in the domain (`FleetMetrics`), not in the component.
+The look follows 1Now's site: their coral (`#FE7743`), navy headings, pill buttons with an orange glow, and white cards with soft shadows. The 1NOW logo is the official SVG path, inlined (`presentation/components/LogoMark.tsx`), and the favicon is `app/icon.svg`. Under the hero, a "Fleet · next 14 days" card shows revenue protected, utilization, bookings in view and conflicts blocked. Utilization is computed in the domain (`FleetMetrics`), not in the component.
 
 ## Domain rules
 
