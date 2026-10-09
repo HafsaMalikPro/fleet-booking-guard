@@ -56,7 +56,8 @@ describe('BookingForm', () => {
   it('calls onSubmit with the selected car, dates, numeric buffer and customer', async () => {
     const { onSubmit, user } = setup();
 
-    await user.selectOptions(screen.getByLabelText('Car'), 'tesla');
+    await user.click(screen.getByLabelText('Car'));
+    await user.click(screen.getByRole('option', { name: /tesla model 3/i }));
     const buffer = screen.getByLabelText('Buffer (hours)');
     await user.clear(buffer);
     await user.type(buffer, '6');

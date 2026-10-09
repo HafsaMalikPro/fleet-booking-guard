@@ -53,7 +53,8 @@ describe('Dashboard (integration with the real composition root)', () => {
     expect(await screen.findByText('Fleet timeline')).toBeInTheDocument();
 
     // Book the Sprinter 20 days out: beyond the first 14-day window.
-    await user.selectOptions(screen.getByLabelText('Car'), 'Mercedes Sprinter · $189.00/day');
+    await user.click(screen.getByLabelText('Car'));
+    await user.click(screen.getByRole('option', { name: /mercedes sprinter/i }));
     for (const field of ['Pickup', 'Return'] as const) {
       await user.click(screen.getByLabelText(field));
       await user.keyboard('{ArrowDown}{ArrowDown}{ArrowRight>5/}'); // +19 days

@@ -1,7 +1,7 @@
 'use client';
 
 import { startOfDay } from 'date-fns';
-import { ArrowRight, CalendarClock } from 'lucide-react';
+import { ArrowRight, CalendarClock, CarFront } from 'lucide-react';
 import { useId, useState, type FormEvent } from 'react';
 import type {
   CreateBookingInput,
@@ -14,6 +14,7 @@ import { formatCurrency } from '@/src/lib/formatCurrency';
 import { Button } from '@/src/components/common/Button';
 import { DateTimePicker } from '@/src/components/common/DateTimePicker';
 import { Card } from '@/src/components/common/Card';
+import { Select } from '@/src/components/common/Select';
 import { IconChip } from '@/src/components/common/IconChip';
 
 export interface BookingFormDefaults {
@@ -62,8 +63,6 @@ const labelClass = 'text-[13px] font-semibold text-ink/80';
 const inputClass =
   'mt-1.5 block h-11 w-full rounded-xl border border-neutral-200 bg-neutral-50/70 px-3.5 text-sm text-ink transition-colors placeholder:text-ink/35 hover:border-neutral-300 focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-500/15';
 const invalidClass = 'border-brand-500 bg-brand-50/50';
-const CHEVRON =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%231B2537' stroke-opacity='.5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E\")";
 
 function FieldError({ id, message }: { id: string; message: string | undefined }) {
   if (!message) return null;
@@ -142,26 +141,21 @@ export function BookingForm({
           <label htmlFor={ids.carId} className={labelClass}>
             Car
           </label>
-          <select
+          <Select
             id={ids.carId}
             value={values.carId}
-            onChange={(e) => update('carId')(e.target.value)}
-            aria-invalid={Boolean(errors.carId)}
-            aria-describedby={describedBy('carId')}
-            className={cn(inputClass, 'appearance-none pr-10', errors.carId && invalidClass)}
-            style={{
-              backgroundImage: CHEVRON,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 0.9rem center',
-            }}
-          >
-            <option value="">Select a car…</option>
-            {cars.map((car) => (
-              <option key={car.id} value={car.id}>
-                {car.name} · {formatCurrency(car.dailyRateCents)}/day
-              </option>
-            ))}
-          </select>
+            onChange={update('carId')}
+            placeholder="Select a car…"
+            icon={<CarFront className="h-4 w-4" aria-hidden="true" />}
+            options={cars.map((car) => ({
+              value: car.id,
+              label: car.name,
+              description: `${car.category} · ${car.plate}`,
+              meta: `${formatCurrency(car.dailyRateCents)}/day`,
+            }))}
+            invalid={Boolean(errors.carId)}
+            describedBy={describedBy('carId')}
+          />
           <FieldError id={`${ids.carId}-error`} message={errors.carId} />
         </div>
 
