@@ -16,24 +16,20 @@ export function RevenueBadge({ cents }: { cents: number }) {
 
   return (
     <div
-      className="flex items-center gap-3 rounded-2xl border border-brand-100 bg-white py-1.5 pl-1.5 pr-4 shadow-card"
+      className="flex items-center gap-2.5 rounded-full border border-brand-200 bg-white py-1 pl-1 pr-4 shadow-glow"
       role="status"
       aria-label={`Revenue protected: ${formatCurrency(cents)}`}
     >
-      <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-white">
-        <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-white">
+        <ShieldCheck className="h-4 w-4" aria-hidden="true" />
       </span>
-      <div className="leading-tight">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-ink/50">
-          Revenue protected
-        </p>
-        <p
-          key={bumps}
-          className={`origin-left text-lg font-bold tabular-nums text-ink ${bumps > 0 ? 'motion-safe:animate-pop' : ''}`}
-        >
-          {formatCurrency(cents)}
-        </p>
-      </div>
+      <span className="hidden text-xs font-medium text-ink/55 sm:inline">Revenue protected</span>
+      <span
+        key={bumps}
+        className={`inline-block text-[15px] font-bold tabular-nums text-ink ${bumps > 0 ? 'motion-safe:animate-pop' : ''}`}
+      >
+        {formatCurrency(cents)}
+      </span>
     </div>
   );
 }

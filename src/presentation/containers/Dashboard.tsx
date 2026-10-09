@@ -1,6 +1,6 @@
 'use client';
 
-import { addDays, setHours, startOfDay } from 'date-fns';
+import { addDays, format, setHours, startOfDay } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
 import { toDateTimeLocal } from '@/lib/formatDate';
 import { BookingConfirmation } from '../components/BookingConfirmation';
@@ -8,9 +8,10 @@ import { BookingForm, type BookingFormDefaults } from '../components/BookingForm
 import { CalendarGrid } from '../components/CalendarGrid';
 import { ConflictPanel } from '../components/ConflictPanel';
 import { FleetList } from '../components/FleetList';
+import { FleetSummary } from '../components/FleetSummary';
 import { EmptyFleet, LoadingCard } from '../components/StatusStates';
 import { useCreateBooking } from '../hooks/useCreateBooking';
-import { useFleetCalendar } from '../hooks/useFleetCalendar';
+import { useFleetCalendar, useFleetSummary } from '../hooks/useFleetCalendar';
 
 const WINDOW_DAYS = 14;
 const HORIZON_DAYS = 30;
@@ -28,13 +29,17 @@ export function Dashboard() {
   const [bufferHours, setBufferHours] = useState(DEFAULT_BUFFER_HOURS);
   const from = useMemo(() => (now ? addDays(startOfDay(now), offset) : null), [now, offset]);
   const calendarState = useFleetCalendar(from, WINDOW_DAYS);
+  const summary = useFleetSummary(from, WINDOW_DAYS);
   const { state, submit, acceptAlternative, bookNextFreeSlot, reset } = useCreateBooking();
 
-  if (!now || calendarState.status === 'loading') {
+  if (!now || !summary || calendarState.status === 'loading') {
     return (
-      <div className="grid gap-6 lg:grid-cols-[400px_minmax(0,1fr)]">
-        <LoadingCard label="Loading booking form" />
-        <LoadingCard label="Loading fleet timeline" />
+      <div className="space-y-6">
+        <LoadingCard label="Loading fleet summary" />
+        <div className="grid gap-6 lg:grid-cols-[400px_minmax(0,1fr)]">
+          <LoadingCard label="Loading booking form" />
+          <LoadingCard label="Loading fleet timeline" />
+        </div>
       </div>
     );
   }
@@ -51,60 +56,72 @@ export function Dashboard() {
     bufferHours: DEFAULT_BUFFER_HOURS,
   };
 
-  return (
-    <div className="grid items-start gap-6 lg:grid-cols-[400px_minmax(0,1fr)]">
-      <div className="space-y-4">
-        <BookingForm
-          cars={cars}
-          defaultValues={defaults}
-          serverError={state.phase === 'invalid' ? state.error : null}
-          onInvalid={reset}
-          onSubmit={(input) => {
-            setBufferHours(input.bufferHours);
-            submit(input);
-          }}
-        />
-        {/* Persistent live region so screen readers announce results as they appear. */}
-        <div aria-live="polite" className="space-y-4">
-          {state.phase === 'conflict' && (
-            <ConflictPanel
-              carName={carName(state.outcome.request.carId)}
-              conflicts={state.outcome.conflicts}
-              alternatives={state.outcome.alternatives}
-              nextFreeSlot={state.outcome.nextFreeSlot}
-              bufferHours={state.outcome.bufferHours}
-              error={state.acceptError}
-              onSelectAlternative={acceptAlternative}
-              onBookNextSlot={bookNextFreeSlot}
-              onDismiss={reset}
-            />
-          )}
-          {state.phase === 'created' && (
-            <BookingConfirmation
-              carName={carName(state.booking.carId)}
-              customerName={state.booking.customerName}
-              range={state.booking.range}
-              viaAlternative={state.viaAlternative}
-              onDismiss={reset}
-            />
-          )}
-        </div>
-      </div>
+  const { from: windowStart } = calendarState.calendar;
+  const windowLabel = `${format(windowStart, 'MMM d')} – ${format(addDays(windowStart, WINDOW_DAYS - 1), 'MMM d')}`;
 
-      <div className="min-w-0 space-y-6">
-        <CalendarGrid
-          rows={rows}
-          from={calendarState.calendar.from}
-          days={WINDOW_DAYS}
-          now={now}
-          bufferHours={bufferHours}
-          highlight={state.phase === 'conflict' ? state.outcome.request : null}
-          onPrevious={() => setOffset((o) => Math.max(0, o - STEP_DAYS))}
-          onNext={() => setOffset((o) => Math.min(MAX_OFFSET, o + STEP_DAYS))}
-          canGoPrevious={offset > 0}
-          canGoNext={offset < MAX_OFFSET}
-        />
-        <FleetList rows={rows} />
+  return (
+    <div className="space-y-6">
+      <FleetSummary
+        windowLabel={windowLabel}
+        utilization={summary.utilization}
+        bookingCount={summary.bookingCount}
+        blockedCount={summary.blockedCount}
+        protectedCents={summary.protectedRevenue.cents}
+      />
+      <div className="grid items-start gap-6 lg:grid-cols-[400px_minmax(0,1fr)]">
+        <div className="space-y-4">
+          <BookingForm
+            cars={cars}
+            defaultValues={defaults}
+            serverError={state.phase === 'invalid' ? state.error : null}
+            onInvalid={reset}
+            onSubmit={(input) => {
+              setBufferHours(input.bufferHours);
+              submit(input);
+            }}
+          />
+          {/* Persistent live region so screen readers announce results as they appear. */}
+          <div aria-live="polite" className="space-y-4">
+            {state.phase === 'conflict' && (
+              <ConflictPanel
+                carName={carName(state.outcome.request.carId)}
+                conflicts={state.outcome.conflicts}
+                alternatives={state.outcome.alternatives}
+                nextFreeSlot={state.outcome.nextFreeSlot}
+                bufferHours={state.outcome.bufferHours}
+                error={state.acceptError}
+                onSelectAlternative={acceptAlternative}
+                onBookNextSlot={bookNextFreeSlot}
+                onDismiss={reset}
+              />
+            )}
+            {state.phase === 'created' && (
+              <BookingConfirmation
+                carName={carName(state.booking.carId)}
+                customerName={state.booking.customerName}
+                range={state.booking.range}
+                viaAlternative={state.viaAlternative}
+                onDismiss={reset}
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="min-w-0 space-y-6">
+          <CalendarGrid
+            rows={rows}
+            from={calendarState.calendar.from}
+            days={WINDOW_DAYS}
+            now={now}
+            bufferHours={bufferHours}
+            highlight={state.phase === 'conflict' ? state.outcome.request : null}
+            onPrevious={() => setOffset((o) => Math.max(0, o - STEP_DAYS))}
+            onNext={() => setOffset((o) => Math.min(MAX_OFFSET, o + STEP_DAYS))}
+            canGoPrevious={offset > 0}
+            canGoNext={offset < MAX_OFFSET}
+          />
+          <FleetList rows={rows} />
+        </div>
       </div>
     </div>
   );

@@ -28,20 +28,23 @@ export function AlternativesList({ alternatives, onSelect }: AlternativesListPro
             type="button"
             onClick={() => onSelect(alt.car.id)}
             aria-label={`Book ${alt.car.name} for ${formatCurrency(alt.totalPrice.cents)}`}
-            className="focus-ring group flex w-full items-center gap-3 rounded-xl border border-brand-100 bg-white p-3 text-left transition-all hover:border-brand-300 hover:shadow-glow"
+            className="focus-ring group flex w-full items-center gap-3 rounded-xl border border-neutral-200/80 bg-white p-3 text-left transition-all duration-200 hover:-translate-y-px hover:border-brand-300 hover:shadow-glow"
           >
             <IconChip>
               <CarIcon className="h-4 w-4" />
             </IconChip>
             <span className="min-w-0 flex-1">
-              <span className="flex items-center gap-2">
-                <span className="truncate text-sm font-semibold text-ink" data-testid="alt-name">
-                  {alt.car.name}
+              <span
+                className="block truncate text-sm font-semibold text-ink"
+                data-testid="alt-name"
+              >
+                {alt.car.name}
+              </span>
+              <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink/55">
+                <span className="whitespace-nowrap">
+                  {alt.car.category} · {formatCurrency(alt.car.dailyRateCents)}/day
                 </span>
                 {index === 0 && <Badge tone="buffer">Best price</Badge>}
-              </span>
-              <span className="text-xs text-ink/55">
-                {alt.car.category} · {formatCurrency(alt.car.dailyRateCents)}/day
               </span>
             </span>
             <span className="text-right">
@@ -52,10 +55,12 @@ export function AlternativesList({ alternatives, onSelect }: AlternativesListPro
                 {alt.days} {alt.days === 1 ? 'day' : 'days'}
               </span>
             </span>
-            <ArrowRight
-              className="h-4 w-4 text-brand-500 transition-transform group-hover:translate-x-0.5"
+            <span
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand-50 text-brand-500 transition-colors group-hover:bg-brand-500 group-hover:text-white"
               aria-hidden="true"
-            />
+            >
+              <ArrowRight className="h-4 w-4" />
+            </span>
           </button>
         </li>
       ))}

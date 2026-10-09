@@ -1,6 +1,6 @@
 'use client';
 
-import { addDays, addHours, format, isSameDay } from 'date-fns';
+import { addDays, addHours, format, isSameDay, isWeekend } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import type { CalendarRow } from '@/application/dto/BookingDto';
@@ -66,7 +66,7 @@ export function CalendarGrid({
 
   return (
     <Card className="overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-brand-100/70 px-5 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 px-5 py-4">
         <div>
           <h2 className="text-lg font-bold tracking-tight text-ink">Fleet timeline</h2>
           <p className="text-sm text-ink/55">
@@ -74,12 +74,12 @@ export function CalendarGrid({
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="hidden items-center gap-3 text-xs text-ink/60 sm:flex">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-4 rounded-sm bg-brand-500" aria-hidden="true" /> Booking
+          <div className="hidden items-center gap-2 text-xs font-medium text-ink/60 sm:flex">
+            <span className="flex items-center gap-1.5 rounded-full bg-neutral-50 px-2.5 py-1 ring-1 ring-inset ring-neutral-200/70">
+              <span className="h-2 w-2 rounded-full bg-brand-500" aria-hidden="true" /> Booking
             </span>
-            <span className="flex items-center gap-1.5">
-              <span className="buffer-stripes h-2.5 w-4 rounded-sm" aria-hidden="true" />
+            <span className="flex items-center gap-1.5 rounded-full bg-neutral-50 px-2.5 py-1 ring-1 ring-inset ring-neutral-200/70">
+              <span className="buffer-stripes h-2 w-3 rounded-sm" aria-hidden="true" />
               Buffer ({bufferHours}h)
             </span>
           </div>
@@ -108,8 +108,8 @@ export function CalendarGrid({
 
       <div className="overflow-x-auto" onScroll={() => setTooltip(null)}>
         <div className="min-w-[760px]">
-          <div className="grid grid-cols-[168px_1fr] border-b border-neutral-100 bg-neutral-50/60">
-            <div className="px-5 py-2 text-xs font-semibold uppercase tracking-wider text-ink/45">
+          <div className="grid grid-cols-[176px_1fr] border-b border-neutral-100">
+            <div className="flex items-end px-5 pb-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink/40">
               Car
             </div>
             <div
@@ -120,12 +120,19 @@ export function CalendarGrid({
                 <div
                   key={day.toISOString()}
                   className={cn(
-                    'border-l border-neutral-100 py-2 text-center text-[11px] leading-tight text-ink/50',
-                    isSameDay(day, now) && 'font-bold text-brand-600',
+                    'flex flex-col items-center gap-1 py-2.5 text-[11px] leading-none text-ink/45',
+                    isWeekend(day) && 'bg-neutral-50/80',
                   )}
                 >
-                  <div>{format(day, 'EEE')}</div>
-                  <div className="text-xs font-semibold text-ink/80">{format(day, 'd')}</div>
+                  <span>{format(day, 'EEE')}</span>
+                  <span
+                    className={cn(
+                      'inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold text-ink/80',
+                      isSameDay(day, now) && 'bg-brand-500 text-white shadow-cta',
+                    )}
+                  >
+                    {format(day, 'd')}
+                  </span>
                 </div>
               ))}
             </div>
@@ -141,27 +148,35 @@ export function CalendarGrid({
                 <li
                   key={car.id}
                   className={cn(
-                    'grid grid-cols-[168px_1fr] border-b border-neutral-100 last:border-b-0',
-                    isHighlighted && 'bg-brand-50/50',
+                    'grid grid-cols-[176px_1fr] border-b border-neutral-100 transition-colors last:border-b-0 hover:bg-neutral-50/50',
+                    isHighlighted && 'bg-brand-50/60 hover:bg-brand-50/60',
                   )}
                 >
-                  <div className="px-5 py-3">
+                  <div className="flex flex-col justify-center px-5 py-3">
                     <p className="truncate text-sm font-semibold text-ink">{car.name}</p>
-                    <p className="text-xs text-ink/50">{formatCurrency(car.dailyRateCents)}/day</p>
+                    <p className="text-xs text-ink/45">
+                      {car.category} · {formatCurrency(car.dailyRateCents)}/day
+                    </p>
                   </div>
-                  <div className="relative h-16">
+                  <div className="relative h-[60px]">
                     <div
                       className="absolute inset-0 grid"
                       style={{ gridTemplateColumns: `repeat(${days}, minmax(0, 1fr))` }}
                       aria-hidden="true"
                     >
                       {dayList.map((day) => (
-                        <div key={day.toISOString()} className="border-l border-neutral-100" />
+                        <div
+                          key={day.toISOString()}
+                          className={cn(
+                            'border-l border-neutral-100',
+                            isWeekend(day) && 'bg-neutral-50/80',
+                          )}
+                        />
                       ))}
                     </div>
                     {nowPosition && (
                       <div
-                        className="absolute inset-y-0 w-px bg-brand-500/60"
+                        className="absolute inset-y-0 w-0.5 rounded-full bg-brand-500/70"
                         style={{ left: nowPosition.left }}
                         aria-hidden="true"
                       />
@@ -182,7 +197,7 @@ export function CalendarGrid({
                         <div key={booking.id}>
                           {buffer && (
                             <div
-                              className="buffer-stripes absolute top-3 h-10 rounded-r-md"
+                              className="buffer-stripes absolute top-3 h-9 rounded-r-lg"
                               style={buffer}
                               aria-hidden="true"
                             />
@@ -196,7 +211,7 @@ export function CalendarGrid({
                               onFocus={(e) => showTooltip(booking, car.name, e.currentTarget)}
                               onMouseLeave={() => setTooltip(null)}
                               onBlur={() => setTooltip(null)}
-                              className="focus-ring absolute top-3 flex h-10 cursor-default items-center overflow-hidden rounded-md bg-brand-500 px-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-brand-600"
+                              className="focus-ring absolute top-3 flex h-9 cursor-default items-center overflow-hidden rounded-lg bg-gradient-to-r from-brand-500 to-brand-400 px-2.5 text-xs font-semibold text-white shadow-sm shadow-brand-500/30 ring-1 ring-inset ring-white/20 transition-all hover:from-brand-600 hover:to-brand-500 hover:shadow-md"
                               style={block}
                             >
                               <span className="truncate">{booking.customerName}</span>
@@ -207,7 +222,7 @@ export function CalendarGrid({
                     })}
                     {outline && (
                       <div
-                        className="pointer-events-none absolute top-1.5 h-[52px] rounded-lg border-2 border-dashed border-ink/70"
+                        className="pointer-events-none absolute top-1.5 h-12 rounded-xl border-2 border-dashed border-ink/60 bg-ink/[0.03]"
                         style={outline}
                         aria-hidden="true"
                       />

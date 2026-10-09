@@ -10,7 +10,7 @@ export function FleetList({ rows }: { rows: readonly CalendarRow[] }) {
     <Card className="p-5">
       <h2 className="text-lg font-bold tracking-tight text-ink">Fleet</h2>
       <p className="text-sm text-ink/55">{rows.length} cars · bookings in the visible window</p>
-      <ul className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+      <ul className="mt-4 grid gap-2 sm:grid-cols-2">
         {rows.map(({ car, bookings }) => (
           <li
             key={car.id}

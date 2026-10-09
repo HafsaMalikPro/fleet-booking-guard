@@ -38,7 +38,7 @@ Requires Node 18.18+ (developed on Node 22).
 ┌──────────────────────────────────────────────────────────────────────┐
 │ application/      Use cases + ports (interfaces) + DTOs + Result     │
 │   CreateBooking · AcceptAlternative · FindAlternatives               │
-│   GetFleetCalendar · GetRevenueProtected                             │
+│   GetFleetCalendar · GetFleetSummary · GetRevenueProtected           │
 │   ports: FleetRepository · BookingRepository · RevenueLedger         │
 └──────────────┬───────────────────────────────────▲───────────────────┘
                ▼                                   │ implements
@@ -47,7 +47,7 @@ Requires Node 18.18+ (developed on Node 22).
 │   DateRange · Money              │  │   InMemory*Repository          │
 │   ConflictDetector               │  │   InMemoryRevenueLedger        │
 │   AlternativeFinder              │  │   seed/ (7 cars, 26 bookings)  │
-│   RevenueCalculator              │  └────────────────────────────────┘
+│   RevenueCalculator · FleetMetrics│ └────────────────────────────────┘
 └──────────────────────────────────┘
 ```
 
@@ -61,6 +61,10 @@ I added two small things to the suggested structure:
 
 - `application/ports/RevenueLedger.ts`, because blocked and protected requests need somewhere to live behind an interface.
 - `presentation/containers/`, which keeps hooks out of presentational components and keeps `page.tsx` thin.
+
+## UI
+
+The look follows 1Now's site: their coral (`#F07C4E`), navy headings, pill buttons with an orange glow, and white cards with soft shadows. The 1NOW mark and wordmark are drawn as inline SVG (`presentation/components/LogoMark.tsx`), and the favicon is `app/icon.svg`. Under the hero, a "Fleet · next 14 days" card shows revenue protected, utilization, bookings in view and conflicts blocked. Utilization is computed in the domain (`FleetMetrics`), not in the component.
 
 ## Domain rules
 
@@ -91,7 +95,7 @@ I added two small things to the suggested structure:
 
 Pure logic tests run in the `node` environment. Component tests opt into `jsdom` with a docblock, which keeps the suite fast.
 
-**Results:** 57 tests in 13 files, all passing. Coverage on `src/domain` and `src/application` is **100%** for statements, branches, functions and lines. The 90% threshold is enforced in `vitest.config.mts`.
+**Results:** 60 tests in 15 files, all passing. Coverage on `src/domain` and `src/application` is **100%** for statements, branches, functions and lines. The 90% threshold is enforced in `vitest.config.mts`.
 
 ## Next steps
 

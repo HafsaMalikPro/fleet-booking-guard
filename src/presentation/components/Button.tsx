@@ -10,15 +10,15 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants: Record<Variant, string> = {
-  primary:
-    'bg-brand-500 text-white shadow-sm shadow-brand-500/30 hover:bg-brand-600 active:bg-brand-700',
-  secondary: 'border border-brand-200 bg-white text-ink hover:border-brand-300 hover:bg-brand-50',
-  ghost: 'text-ink/70 hover:bg-brand-50 hover:text-ink',
+  primary: 'bg-brand-500 text-white shadow-cta hover:bg-brand-600 active:bg-brand-700',
+  secondary:
+    'border border-brand-300 bg-white text-ink hover:border-brand-500 hover:bg-brand-50/60',
+  ghost: 'text-ink/60 hover:bg-neutral-100 hover:text-ink',
 };
 
 const sizes: Record<Size, string> = {
-  sm: 'h-8 px-3 text-sm',
-  md: 'h-11 px-5 text-sm',
+  sm: 'h-9 px-4 text-sm',
+  md: 'h-12 px-6 text-[15px]',
 };
 
 export function Button({
@@ -32,8 +32,8 @@ export function Button({
     <button
       type={type}
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors',
-        'focus-ring disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-200',
+        'focus-ring disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none',
         variants[variant],
         sizes[size],
         className,

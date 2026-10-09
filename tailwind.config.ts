@@ -6,24 +6,25 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50: '#FFF4EE',
-          100: '#FFE6D9',
-          200: '#FFCBB3',
-          300: '#FFA984',
-          400: '#FF8F62',
-          500: '#FF7A45',
-          600: '#F0612A',
-          700: '#C84B1C',
+          50: '#FEF4EF',
+          100: '#FDE6DB',
+          200: '#FACCB6',
+          300: '#F6AB8A',
+          400: '#F39268',
+          500: '#F07C4E',
+          600: '#E0643A',
+          700: '#B94D2B',
         },
-        ink: '#1A1A1A',
-        canvas: '#F5F5F3',
+        ink: '#1B2537',
+        canvas: '#FAFAF8',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        card: '0 1px 2px rgba(26,26,26,0.04), 0 8px 24px -12px rgba(26,26,26,0.12)',
-        glow: '0 1px 2px rgba(26,26,26,0.04), 0 12px 32px -12px rgba(255,122,69,0.35)',
+        card: '0 1px 2px rgba(27,37,55,0.04), 0 10px 30px -14px rgba(27,37,55,0.14)',
+        glow: '0 1px 2px rgba(27,37,55,0.04), 0 14px 36px -14px rgba(240,124,78,0.45)',
+        cta: '0 10px 28px -8px rgba(240,124,78,0.65)',
       },
       keyframes: {
         'fade-in-up': {

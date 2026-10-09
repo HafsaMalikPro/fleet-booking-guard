@@ -6,14 +6,17 @@
   body {
     @apply bg-canvas text-ink;
     background-image:
-      radial-gradient(40rem 28rem at 0% 0%, rgba(255, 122, 69, 0.14), transparent 70%),
-      radial-gradient(36rem 26rem at 100% 0%, rgba(255, 122, 69, 0.1), transparent 70%),
-      radial-gradient(32rem 24rem at 100% 100%, rgba(255, 122, 69, 0.08), transparent 70%);
-    background-attachment: fixed;
+      radial-gradient(42rem 30rem at 100% -6rem, rgba(240, 124, 78, 0.13), transparent 70%),
+      radial-gradient(36rem 26rem at -8rem 10rem, rgba(240, 124, 78, 0.08), transparent 70%);
+    background-repeat: no-repeat;
+  }
+
+  ::selection {
+    @apply bg-brand-200 text-ink;
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-canvas;
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-white;
   }
 }
 
@@ -23,11 +26,11 @@
   }
 
   .buffer-stripes {
-    background-color: #ffe6d9;
+    background-color: #fde6db;
     background-image: repeating-linear-gradient(
       -45deg,
-      rgba(255, 122, 69, 0.35) 0 4px,
-      transparent 4px 8px
+      rgba(240, 124, 78, 0.38) 0 3px,
+      transparent 3px 7px
     );
   }
 }

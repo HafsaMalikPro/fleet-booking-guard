@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarClock } from 'lucide-react';
+import { ArrowRight, CalendarClock } from 'lucide-react';
 import { useId, useState, type FormEvent } from 'react';
 import type {
   CreateBookingInput,
@@ -56,14 +56,17 @@ function validate(values: Values): Errors {
   return errors;
 }
 
+const labelClass = 'text-[13px] font-semibold text-ink/80';
 const inputClass =
-  'mt-1.5 block w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm text-ink shadow-sm transition-colors placeholder:text-ink/35 hover:border-brand-200 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/40';
-const invalidClass = 'border-brand-500 bg-brand-50/40';
+  'mt-1.5 block h-11 w-full rounded-xl border border-neutral-200 bg-neutral-50/70 px-3.5 text-sm text-ink transition-colors placeholder:text-ink/35 hover:border-neutral-300 focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-500/15';
+const invalidClass = 'border-brand-500 bg-brand-50/50';
+const CHEVRON =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%231B2537' stroke-opacity='.5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E\")";
 
 function FieldError({ id, message }: { id: string; message: string | undefined }) {
   if (!message) return null;
   return (
-    <p id={id} className="mt-1.5 text-xs font-medium text-brand-700">
+    <p id={id} className="mt-1.5 flex items-center gap-1 text-xs font-medium text-brand-700">
       {message}
     </p>
   );
@@ -121,21 +124,19 @@ export function BookingForm({
 
   return (
     <Card className="p-5 sm:p-6">
-      <div className="mb-5 flex items-center gap-3">
+      <div className="mb-6 flex items-center gap-3">
         <IconChip>
           <CalendarClock className="h-5 w-5" />
         </IconChip>
         <div>
           <h2 className="text-lg font-bold tracking-tight text-ink">New booking request</h2>
-          <p className="text-sm text-ink/55">
-            We check every car for overlaps and turnaround time.
-          </p>
+          <p className="text-sm text-ink/55">Checked for overlaps and turnaround time.</p>
         </div>
       </div>
 
       <form noValidate onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor={ids.carId} className="text-sm font-semibold text-ink">
+          <label htmlFor={ids.carId} className={labelClass}>
             Car
           </label>
           <select
@@ -144,7 +145,12 @@ export function BookingForm({
             onChange={(e) => update('carId')(e.target.value)}
             aria-invalid={Boolean(errors.carId)}
             aria-describedby={describedBy('carId')}
-            className={cn(inputClass, errors.carId && invalidClass)}
+            className={cn(inputClass, 'appearance-none pr-10', errors.carId && invalidClass)}
+            style={{
+              backgroundImage: CHEVRON,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 0.9rem center',
+            }}
           >
             <option value="">Select a car…</option>
             {cars.map((car) => (
@@ -156,42 +162,41 @@ export function BookingForm({
           <FieldError id={`${ids.carId}-error`} message={errors.carId} />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-          <div>
-            <label htmlFor={ids.pickup} className="text-sm font-semibold text-ink">
-              Pickup
-            </label>
-            <input
-              id={ids.pickup}
-              type="datetime-local"
-              value={values.pickup}
-              onChange={(e) => update('pickup')(e.target.value)}
-              aria-invalid={Boolean(errors.pickup)}
-              aria-describedby={describedBy('pickup')}
-              className={cn(inputClass, errors.pickup && invalidClass)}
-            />
-            <FieldError id={`${ids.pickup}-error`} message={errors.pickup} />
-          </div>
-          <div>
-            <label htmlFor={ids.returnAt} className="text-sm font-semibold text-ink">
-              Return
-            </label>
-            <input
-              id={ids.returnAt}
-              type="datetime-local"
-              value={values.returnAt}
-              onChange={(e) => update('returnAt')(e.target.value)}
-              aria-invalid={Boolean(errors.returnAt)}
-              aria-describedby={describedBy('returnAt')}
-              className={cn(inputClass, errors.returnAt && invalidClass)}
-            />
-            <FieldError id={`${ids.returnAt}-error`} message={errors.returnAt} />
-          </div>
+        <div>
+          <label htmlFor={ids.pickup} className={labelClass}>
+            Pickup
+          </label>
+          <input
+            id={ids.pickup}
+            type="datetime-local"
+            value={values.pickup}
+            onChange={(e) => update('pickup')(e.target.value)}
+            aria-invalid={Boolean(errors.pickup)}
+            aria-describedby={describedBy('pickup')}
+            className={cn(inputClass, errors.pickup && invalidClass)}
+          />
+          <FieldError id={`${ids.pickup}-error`} message={errors.pickup} />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+        <div>
+          <label htmlFor={ids.returnAt} className={labelClass}>
+            Return
+          </label>
+          <input
+            id={ids.returnAt}
+            type="datetime-local"
+            value={values.returnAt}
+            onChange={(e) => update('returnAt')(e.target.value)}
+            aria-invalid={Boolean(errors.returnAt)}
+            aria-describedby={describedBy('returnAt')}
+            className={cn(inputClass, errors.returnAt && invalidClass)}
+          />
+          <FieldError id={`${ids.returnAt}-error`} message={errors.returnAt} />
+        </div>
+
+        <div className="grid grid-cols-[120px_1fr] gap-3">
           <div>
-            <label htmlFor={ids.bufferHours} className="text-sm font-semibold text-ink">
+            <label htmlFor={ids.bufferHours} className={labelClass}>
               Buffer (hours)
             </label>
             <input
@@ -206,11 +211,10 @@ export function BookingForm({
               aria-describedby={describedBy('bufferHours')}
               className={cn(inputClass, errors.bufferHours && invalidClass)}
             />
-            <FieldError id={`${ids.bufferHours}-error`} message={errors.bufferHours} />
           </div>
           <div>
-            <label htmlFor={ids.customerName} className="text-sm font-semibold text-ink">
-              Customer <span className="font-normal text-ink/45">(optional)</span>
+            <label htmlFor={ids.customerName} className={labelClass}>
+              Customer <span className="font-normal text-ink/40">(optional)</span>
             </label>
             <input
               id={ids.customerName}
@@ -223,9 +227,11 @@ export function BookingForm({
             />
           </div>
         </div>
+        <FieldError id={`${ids.bufferHours}-error`} message={errors.bufferHours} />
 
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="mt-2 w-full">
           Check &amp; book
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Button>
       </form>
     </Card>

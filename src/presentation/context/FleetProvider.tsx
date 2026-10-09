@@ -5,6 +5,7 @@ import { AcceptAlternative } from '@/application/use-cases/AcceptAlternative';
 import { CreateBooking } from '@/application/use-cases/CreateBooking';
 import { FindAlternatives } from '@/application/use-cases/FindAlternatives';
 import { GetFleetCalendar } from '@/application/use-cases/GetFleetCalendar';
+import { GetFleetSummary } from '@/application/use-cases/GetFleetSummary';
 import { GetRevenueProtected } from '@/application/use-cases/GetRevenueProtected';
 import { InMemoryBookingRepository } from '@/infrastructure/repositories/InMemoryBookingRepository';
 import { InMemoryFleetRepository } from '@/infrastructure/repositories/InMemoryFleetRepository';
@@ -13,6 +14,7 @@ import { createSeed } from '@/infrastructure/seed/seed';
 
 export interface FleetServices {
   readonly getFleetCalendar: GetFleetCalendar;
+  readonly getFleetSummary: GetFleetSummary;
   readonly createBooking: CreateBooking;
   readonly acceptAlternative: AcceptAlternative;
   readonly getRevenueProtected: GetRevenueProtected;
@@ -36,6 +38,7 @@ export function createFleetServices(now: Date): FleetServices {
   const findAlternatives = new FindAlternatives(fleet, bookings);
   return {
     getFleetCalendar: new GetFleetCalendar(fleet, bookings),
+    getFleetSummary: new GetFleetSummary(fleet, bookings, ledger),
     createBooking: new CreateBooking(fleet, bookings, ledger, findAlternatives),
     acceptAlternative: new AcceptAlternative(fleet, bookings, ledger),
     getRevenueProtected: new GetRevenueProtected(fleet, ledger),

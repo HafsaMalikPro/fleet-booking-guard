@@ -2,7 +2,7 @@
 
 import { addDays } from 'date-fns';
 import { useMemo } from 'react';
-import type { FleetCalendar } from '@/application/dto/BookingDto';
+import type { FleetCalendar, FleetSummary } from '@/application/dto/BookingDto';
 import { useFleet } from '../context/FleetProvider';
 
 export type FleetCalendarState =
@@ -26,4 +26,13 @@ export function useRevenueProtected(): number {
   const { services, version } = useFleet();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(() => services.getRevenueProtected.execute().cents, [services, version]);
+}
+
+export function useFleetSummary(from: Date | null, days: number): FleetSummary | null {
+  const { services, version } = useFleet();
+  return useMemo(
+    () => (from ? services.getFleetSummary.execute(from, addDays(from, days)) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [services, from, days, version],
+  );
 }

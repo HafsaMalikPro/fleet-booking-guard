@@ -7,7 +7,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 
 export const metadata: Metadata = {
-  title: 'Fleet Booking Guard',
+  title: 'Fleet Booking Guard · 1Now',
   description: 'Block double-bookings and back-to-back rentals before they cost you money.',
 };
 

@@ -6,7 +6,7 @@ export function IconChip({ children, className }: { children: ReactNode; classNa
     <span
       aria-hidden="true"
       className={cn(
-        'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-500 ring-1 ring-inset ring-brand-100',
+        'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-500 ring-1 ring-inset ring-brand-100',
         className,
       )}
     >

@@ -2,6 +2,7 @@ import type { Booking } from '@/domain/entities/Booking';
 import type { Car } from '@/domain/entities/Car';
 import type { Alternative } from '@/domain/services/AlternativeFinder';
 import type { DateRange } from '@/domain/value-objects/DateRange';
+import type { Money } from '@/domain/value-objects/Money';
 
 /** Raw form input. Dates are `datetime-local` strings (local time). */
 export interface CreateBookingInput {
@@ -52,4 +53,12 @@ export interface FleetCalendar {
   readonly from: Date;
   readonly to: Date;
   readonly rows: CalendarRow[];
+}
+
+export interface FleetSummary {
+  /** 0–1 share of car-time booked in the window. */
+  readonly utilization: number;
+  readonly bookingCount: number;
+  readonly blockedCount: number;
+  readonly protectedRevenue: Money;
 }
