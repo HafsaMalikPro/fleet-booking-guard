@@ -50,7 +50,7 @@ describe('BookingForm', () => {
     const { onSubmit, user } = setup();
 
     await user.selectOptions(screen.getByLabelText('Car'), 'tesla');
-    const buffer = screen.getByLabelText('Turnaround buffer (hours)');
+    const buffer = screen.getByLabelText('Buffer (hours)');
     await user.clear(buffer);
     await user.type(buffer, '6');
     await user.type(screen.getByLabelText(/customer/i), 'Alex Morgan');
@@ -65,13 +65,24 @@ describe('BookingForm', () => {
     });
   });
 
-  it('rejects a negative buffer', async () => {
-    const { onSubmit, user } = setup();
-    fireEvent.change(screen.getByLabelText('Turnaround buffer (hours)'), {
+  it('rejects a negative buffer and reports the blocked submit via onInvalid', async () => {
+    const onInvalid = vi.fn();
+    const onSubmit = vi.fn();
+    render(
+      <BookingForm
+        cars={cars}
+        defaultValues={defaults}
+        onSubmit={onSubmit}
+        onInvalid={onInvalid}
+      />,
+    );
+    const user = userEvent.setup();
+    fireEvent.change(screen.getByLabelText('Buffer (hours)'), {
       target: { value: '-2' },
     });
     await user.click(screen.getByRole('button', { name: /check & book/i }));
     expect(screen.getByText('Buffer must be zero or more hours.')).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
+    expect(onInvalid).toHaveBeenCalledTimes(1);
   });
 });

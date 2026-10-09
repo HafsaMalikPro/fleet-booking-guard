@@ -58,6 +58,7 @@ export function Dashboard() {
           cars={cars}
           defaultValues={defaults}
           serverError={state.phase === 'invalid' ? state.error : null}
+          onInvalid={reset}
           onSubmit={(input) => {
             setBufferHours(input.bufferHours);
             submit(input);

@@ -25,6 +25,8 @@ export interface BookingFormProps {
   cars: readonly Car[];
   defaultValues: BookingFormDefaults;
   onSubmit: (input: CreateBookingInput) => void;
+  /** Called when client-side validation blocks a submit. */
+  onInvalid?: () => void;
   /** Validation error returned by the use case, shown next to its field. */
   serverError?: ValidationError | null;
 }
@@ -67,7 +69,13 @@ function FieldError({ id, message }: { id: string; message: string | undefined }
   );
 }
 
-export function BookingForm({ cars, defaultValues, onSubmit, serverError }: BookingFormProps) {
+export function BookingForm({
+  cars,
+  defaultValues,
+  onSubmit,
+  onInvalid,
+  serverError,
+}: BookingFormProps) {
   const uid = useId();
   const [values, setValues] = useState<Values>({
     ...defaultValues,
@@ -88,7 +96,10 @@ export function BookingForm({ cars, defaultValues, onSubmit, serverError }: Book
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setAttempted(true);
-    if (Object.keys(validate(values)).length > 0) return;
+    if (Object.keys(validate(values)).length > 0) {
+      onInvalid?.();
+      return;
+    }
     onSubmit({
       carId: values.carId,
       pickup: values.pickup,
@@ -181,7 +192,7 @@ export function BookingForm({ cars, defaultValues, onSubmit, serverError }: Book
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
           <div>
             <label htmlFor={ids.bufferHours} className="text-sm font-semibold text-ink">
-              Turnaround buffer (hours)
+              Buffer (hours)
             </label>
             <input
               id={ids.bufferHours}
