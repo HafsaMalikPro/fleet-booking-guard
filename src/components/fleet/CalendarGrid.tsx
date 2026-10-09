@@ -3,16 +3,17 @@
 import { addDays, addHours, format, isSameDay, isWeekend } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
-import type { CalendarRow } from '@/application/dto/BookingDto';
-import type { Booking } from '@/domain/entities/Booking';
-import type { DateRange } from '@/domain/value-objects/DateRange';
-import { cn } from '@/lib/cn';
-import { formatCurrency } from '@/lib/formatCurrency';
-import { formatShortRange } from '@/lib/formatDate';
-import { Button } from './Button';
-import { Card } from './Card';
+import type { CalendarRow } from '@/src/application/dto/BookingDto';
+import type { Booking } from '@/src/domain/entities/Booking';
+import type { DateRange } from '@/src/domain/value-objects/DateRange';
+import { cn } from '@/src/lib/cn';
+import { formatCurrency } from '@/src/lib/formatCurrency';
+import { formatShortRange } from '@/src/lib/formatDate';
+import { Button } from '@/src/components/common/Button';
+import { Card } from '@/src/components/common/Card';
 
 export interface CalendarGridProps {
+  id?: string;
   rows: readonly CalendarRow[];
   from: Date;
   days: number;
@@ -20,6 +21,8 @@ export interface CalendarGridProps {
   bufferHours: number;
   /** The request being checked, drawn as a dashed outline. */
   highlight?: { carId: string; range: DateRange } | null;
+  /** The booking just created; drawn with a ring and a "New" tag. */
+  recentBookingId?: string | null;
   onPrevious: () => void;
   onNext: () => void;
   canGoPrevious: boolean;
@@ -33,22 +36,34 @@ interface Tooltip {
   y: number;
 }
 
+const CAR_COLUMN = 'grid-cols-[200px_1fr]';
+/** Bars narrower than this many hours drop their label; the tooltip still names the customer. */
+const MIN_LABEL_HOURS = 18;
+
 /** Position of [start, end) as left/width percentages of the visible window, or null if hidden. */
 function place(start: Date, end: Date, from: Date, to: Date) {
   const total = to.getTime() - from.getTime();
   const left = Math.max(start.getTime(), from.getTime()) - from.getTime();
   const right = Math.min(end.getTime(), to.getTime()) - from.getTime();
   if (right <= left) return null;
-  return { left: `${(left / total) * 100}%`, width: `${((right - left) / total) * 100}%` };
+  return {
+    left: `${(left / total) * 100}%`,
+    width: `${((right - left) / total) * 100}%`,
+    visibleHours: (right - left) / 3_600_000,
+    clippedStart: start.getTime() < from.getTime(),
+    clippedEnd: end.getTime() > to.getTime(),
+  };
 }
 
 export function CalendarGrid({
+  id,
   rows,
   from,
   days,
   now,
   bufferHours,
   highlight,
+  recentBookingId,
   onPrevious,
   onNext,
   canGoPrevious,
@@ -65,31 +80,32 @@ export function CalendarGrid({
   };
 
   return (
-    <Card className="overflow-hidden">
+    <Card id={id} className="scroll-mt-6 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 px-5 py-4">
         <div>
           <h2 className="text-lg font-bold tracking-tight text-ink">Fleet timeline</h2>
-          <p className="text-sm text-ink/55">
+          <p className="text-sm text-muted">
             {format(from, 'MMM d')} – {format(addDays(to, -1), 'MMM d, yyyy')}
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="hidden items-center gap-2 text-xs font-medium text-ink/60 sm:flex">
+          <div className="hidden items-center gap-2 text-xs font-medium text-muted sm:flex">
             <span className="flex items-center gap-1.5 rounded-full bg-neutral-50 px-2.5 py-1 ring-1 ring-inset ring-neutral-200/70">
-              <span className="h-2 w-2 rounded-full bg-brand-500" aria-hidden="true" /> Booking
+              <span className="h-2 w-3 rounded-sm bg-brand-500" aria-hidden="true" /> Booking
             </span>
             <span className="flex items-center gap-1.5 rounded-full bg-neutral-50 px-2.5 py-1 ring-1 ring-inset ring-neutral-200/70">
               <span className="buffer-stripes h-2 w-3 rounded-sm" aria-hidden="true" />
               Buffer ({bufferHours}h)
             </span>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             <Button
               variant="secondary"
               size="sm"
               onClick={onPrevious}
               disabled={!canGoPrevious}
               aria-label="Previous week"
+              className="w-9 px-0"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </Button>
@@ -99,6 +115,7 @@ export function CalendarGrid({
               onClick={onNext}
               disabled={!canGoNext}
               aria-label="Next week"
+              className="w-9 px-0"
             >
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </Button>
@@ -108,8 +125,8 @@ export function CalendarGrid({
 
       <div className="overflow-x-auto" onScroll={() => setTooltip(null)}>
         <div className="min-w-[760px]">
-          <div className="grid grid-cols-[176px_1fr] border-b border-neutral-100">
-            <div className="flex items-end px-5 pb-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink/40">
+          <div className={cn('grid border-b border-neutral-100', CAR_COLUMN)}>
+            <div className="flex items-end px-5 pb-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted/80">
               Car
             </div>
             <div
@@ -120,15 +137,16 @@ export function CalendarGrid({
                 <div
                   key={day.toISOString()}
                   className={cn(
-                    'flex flex-col items-center gap-1 py-2.5 text-[11px] leading-none text-ink/45',
+                    'flex flex-col items-center gap-1 py-2.5 text-[11px] leading-none text-muted',
                     isWeekend(day) && 'bg-neutral-50/80',
+                    isSameDay(day, now) && 'bg-brand-50/70 font-semibold text-brand-600',
                   )}
                 >
                   <span>{format(day, 'EEE')}</span>
                   <span
                     className={cn(
-                      'inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold text-ink/80',
-                      isSameDay(day, now) && 'bg-brand-500 text-white shadow-cta',
+                      'inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold text-ink',
+                      isSameDay(day, now) && 'bg-brand-500 text-white',
                     )}
                   >
                     {format(day, 'd')}
@@ -148,13 +166,16 @@ export function CalendarGrid({
                 <li
                   key={car.id}
                   className={cn(
-                    'grid grid-cols-[176px_1fr] border-b border-neutral-100 transition-colors last:border-b-0 hover:bg-neutral-50/50',
+                    'grid border-b border-neutral-100 transition-colors last:border-b-0 hover:bg-neutral-50/50',
+                    CAR_COLUMN,
                     isHighlighted && 'bg-brand-50/60 hover:bg-brand-50/60',
                   )}
                 >
-                  <div className="flex flex-col justify-center px-5 py-3">
-                    <p className="truncate text-sm font-semibold text-ink">{car.name}</p>
-                    <p className="text-xs text-ink/45">
+                  <div className="flex min-w-0 flex-col justify-center px-5 py-3">
+                    <p className="truncate text-sm font-semibold text-ink" title={car.name}>
+                      {car.name}
+                    </p>
+                    <p className="truncate text-xs text-muted">
                       {car.category} · {formatCurrency(car.dailyRateCents)}/day
                     </p>
                   </div>
@@ -170,13 +191,14 @@ export function CalendarGrid({
                           className={cn(
                             'border-l border-neutral-100',
                             isWeekend(day) && 'bg-neutral-50/80',
+                            isSameDay(day, now) && 'bg-brand-50/50',
                           )}
                         />
                       ))}
                     </div>
                     {nowPosition && (
                       <div
-                        className="absolute inset-y-0 w-0.5 rounded-full bg-brand-500/70"
+                        className="absolute inset-y-0 z-10 w-px -translate-x-1/2 bg-brand-500"
                         style={{ left: nowPosition.left }}
                         aria-hidden="true"
                       />
@@ -192,13 +214,18 @@ export function CalendarGrid({
                               to,
                             )
                           : null;
-                      const label = `${booking.customerName}, ${car.name}, ${formatShortRange(booking.range.start, booking.range.end)}`;
+                      const hasBuffer = Boolean(buffer);
+                      const isRecent = booking.id === recentBookingId;
+                      const label = `${isRecent ? 'New booking: ' : ''}${booking.customerName}, ${car.name}, ${formatShortRange(booking.range.start, booking.range.end)}`;
                       return (
                         <div key={booking.id}>
                           {buffer && (
                             <div
-                              className="buffer-stripes absolute top-3 h-9 rounded-r-lg"
-                              style={buffer}
+                              className={cn(
+                                'buffer-stripes absolute top-1/2 h-8 -translate-y-1/2',
+                                !buffer.clippedEnd && 'rounded-r-md',
+                              )}
+                              style={{ left: buffer.left, width: buffer.width }}
                               aria-hidden="true"
                             />
                           )}
@@ -211,10 +238,36 @@ export function CalendarGrid({
                               onFocus={(e) => showTooltip(booking, car.name, e.currentTarget)}
                               onMouseLeave={() => setTooltip(null)}
                               onBlur={() => setTooltip(null)}
-                              className="focus-ring absolute top-3 flex h-9 cursor-default items-center overflow-hidden rounded-lg bg-gradient-to-r from-brand-500 to-brand-400 px-2.5 text-xs font-semibold text-white shadow-sm shadow-brand-500/30 ring-1 ring-inset ring-white/20 transition-all hover:from-brand-600 hover:to-brand-500 hover:shadow-md"
-                              style={block}
+                              className={cn(
+                                'focus-ring absolute top-1/2 flex h-8 -translate-y-1/2 cursor-default items-center gap-1 overflow-hidden rounded-md bg-brand-500 px-2 text-xs font-medium text-white transition-colors hover:bg-brand-600',
+                                block.clippedStart && 'rounded-l-none pl-1.5',
+                                isRecent &&
+                                  'z-20 bg-ink ring-2 ring-brand-500 ring-offset-2 ring-offset-white hover:bg-ink motion-safe:animate-pop',
+                                block.clippedEnd && 'pr-1.5',
+                                (block.clippedEnd || hasBuffer) && 'rounded-r-none',
+                              )}
+                              style={{ left: block.left, width: block.width }}
                             >
-                              <span className="truncate">{booking.customerName}</span>
+                              {block.clippedStart && (
+                                <ChevronLeft
+                                  className="h-3 w-3 shrink-0 opacity-80"
+                                  aria-hidden="true"
+                                />
+                              )}
+                              {isRecent && (
+                                <span className="shrink-0 rounded bg-brand-500 px-1 py-px text-[9px] font-bold uppercase tracking-wider">
+                                  New
+                                </span>
+                              )}
+                              {block.visibleHours >= MIN_LABEL_HOURS && (
+                                <span className="truncate">{booking.customerName}</span>
+                              )}
+                              {block.clippedEnd && (
+                                <ChevronRight
+                                  className="ml-auto h-3 w-3 shrink-0 opacity-80"
+                                  aria-hidden="true"
+                                />
+                              )}
                             </div>
                           )}
                         </div>
@@ -222,8 +275,8 @@ export function CalendarGrid({
                     })}
                     {outline && (
                       <div
-                        className="pointer-events-none absolute top-1.5 h-12 rounded-xl border-2 border-dashed border-ink/60 bg-ink/[0.03]"
-                        style={outline}
+                        className="pointer-events-none absolute top-1/2 h-11 -translate-y-1/2 rounded-lg border-2 border-dashed border-ink/60 bg-ink/[0.03]"
+                        style={{ left: outline.left, width: outline.width }}
                         aria-hidden="true"
                       />
                     )}

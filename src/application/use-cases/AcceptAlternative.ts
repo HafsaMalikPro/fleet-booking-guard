@@ -1,5 +1,5 @@
-import type { Booking } from '@/domain/entities/Booking';
-import { findConflicts } from '@/domain/services/ConflictDetector';
+import type { Booking } from '@/src/domain/entities/Booking';
+import { findConflicts } from '@/src/domain/services/ConflictDetector';
 import type { AcceptAlternativeInput, UnavailableError } from '../dto/BookingDto';
 import type { BookingRepository } from '../ports/BookingRepository';
 import type { FleetRepository } from '../ports/FleetRepository';

@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  content: ['./src/**/*.{ts,tsx}'],
+  content: ['./app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -15,11 +15,13 @@ const config: Config = {
           600: '#EE5E28',
           700: '#C4471A',
         },
-        ink: '#1B2537',
+        ink: '#14253A',
+        muted: '#55677A',
         canvas: '#FAFAF8',
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-geist)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         card: '0 1px 2px rgba(27,37,55,0.04), 0 10px 30px -14px rgba(27,37,55,0.14)',

@@ -1,23 +1,29 @@
 'use client';
 
-import { addDays, format, setHours, startOfDay } from 'date-fns';
-import { useEffect, useMemo, useState } from 'react';
-import { toDateTimeLocal } from '@/lib/formatDate';
-import { BookingConfirmation } from '../components/BookingConfirmation';
-import { BookingForm, type BookingFormDefaults } from '../components/BookingForm';
-import { CalendarGrid } from '../components/CalendarGrid';
-import { ConflictPanel } from '../components/ConflictPanel';
-import { FleetList } from '../components/FleetList';
-import { FleetSummary } from '../components/FleetSummary';
-import { EmptyFleet, LoadingCard } from '../components/StatusStates';
-import { useCreateBooking } from '../hooks/useCreateBooking';
-import { useFleetCalendar, useFleetSummary } from '../hooks/useFleetCalendar';
+import {
+  addDays,
+  differenceInCalendarDays,
+  endOfMonth,
+  format,
+  setHours,
+  startOfDay,
+} from 'date-fns';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { toDateTimeLocal } from '@/src/lib/formatDate';
+import { BookingConfirmation } from '@/src/components/booking/BookingConfirmation';
+import { BookingForm, type BookingFormDefaults } from '@/src/components/booking/BookingForm';
+import { CalendarGrid } from '@/src/components/fleet/CalendarGrid';
+import { ConflictPanel } from '@/src/components/booking/ConflictPanel';
+import { FleetList } from '@/src/components/fleet/FleetList';
+import { FleetSummary } from '@/src/components/fleet/FleetSummary';
+import { EmptyFleet, LoadingCard } from '@/src/components/common/StatusStates';
+import { useCreateBooking } from '@/src/hooks/useCreateBooking';
+import { useFleetCalendar, useFleetSummary } from '@/src/hooks/useFleetCalendar';
 
 const WINDOW_DAYS = 14;
-const HORIZON_DAYS = 30;
 const STEP_DAYS = 7;
-const MAX_OFFSET = HORIZON_DAYS - WINDOW_DAYS;
 const DEFAULT_BUFFER_HOURS = 4;
+const TIMELINE_ID = 'fleet-timeline';
 
 /** Container: wires hooks to presentational components. Holds view state only. */
 export function Dashboard() {
@@ -26,11 +32,36 @@ export function Dashboard() {
   useEffect(() => setNow(new Date()), []);
 
   const [offset, setOffset] = useState(0);
+  // The timeline pages no further than the end of the current month.
+  const maxOffset = now
+    ? Math.max(0, differenceInCalendarDays(endOfMonth(now), startOfDay(now)) + 1 - WINDOW_DAYS)
+    : 0;
   const [bufferHours, setBufferHours] = useState(DEFAULT_BUFFER_HOURS);
   const from = useMemo(() => (now ? addDays(startOfDay(now), offset) : null), [now, offset]);
   const calendarState = useFleetCalendar(from, WINDOW_DAYS);
   const summary = useFleetSummary(from, WINDOW_DAYS);
   const { state, submit, acceptAlternative, bookNextFreeSlot, reset } = useCreateBooking();
+  const createdBooking = state.phase === 'created' ? state.booking : null;
+
+  /** Page the timeline to the week that contains `date`, within the bookable horizon. */
+  const showOnTimeline = useCallback(
+    (date: Date, scroll: boolean) => {
+      if (!now) return;
+      const days = differenceInCalendarDays(date, startOfDay(now));
+      setOffset(Math.min(maxOffset, Math.max(0, Math.floor(days / STEP_DAYS) * STEP_DAYS)));
+      if (scroll) {
+        document
+          .getElementById(TIMELINE_ID)
+          ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    },
+    [now, maxOffset],
+  );
+
+  // A new booking should always be visible: jump the timeline to it.
+  useEffect(() => {
+    if (createdBooking) showOnTimeline(createdBooking.range.start, false);
+  }, [createdBooking, showOnTimeline]);
 
   if (!now || !summary || calendarState.status === 'loading') {
     return (
@@ -101,6 +132,7 @@ export function Dashboard() {
                 customerName={state.booking.customerName}
                 range={state.booking.range}
                 viaAlternative={state.viaAlternative}
+                onViewOnTimeline={() => showOnTimeline(state.booking.range.start, true)}
                 onDismiss={reset}
               />
             )}
@@ -109,18 +141,20 @@ export function Dashboard() {
 
         <div className="min-w-0 space-y-6">
           <CalendarGrid
+            id={TIMELINE_ID}
             rows={rows}
             from={calendarState.calendar.from}
             days={WINDOW_DAYS}
             now={now}
             bufferHours={bufferHours}
             highlight={state.phase === 'conflict' ? state.outcome.request : null}
+            recentBookingId={createdBooking?.id ?? null}
             onPrevious={() => setOffset((o) => Math.max(0, o - STEP_DAYS))}
-            onNext={() => setOffset((o) => Math.min(MAX_OFFSET, o + STEP_DAYS))}
+            onNext={() => setOffset((o) => Math.min(maxOffset, o + STEP_DAYS))}
             canGoPrevious={offset > 0}
-            canGoNext={offset < MAX_OFFSET}
+            canGoNext={offset < maxOffset}
           />
-          <FleetList rows={rows} />
+          <FleetList rows={rows} from={calendarState.calendar.from} days={WINDOW_DAYS} now={now} />
         </div>
       </div>
     </div>

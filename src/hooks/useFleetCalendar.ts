@@ -2,8 +2,8 @@
 
 import { addDays } from 'date-fns';
 import { useMemo } from 'react';
-import type { FleetCalendar, FleetSummary } from '@/application/dto/BookingDto';
-import { useFleet } from '../context/FleetProvider';
+import type { FleetCalendar, FleetSummary } from '@/src/application/dto/BookingDto';
+import { useFleet } from '@/src/context/FleetProvider';
 
 export type FleetCalendarState =
   | { status: 'loading' }

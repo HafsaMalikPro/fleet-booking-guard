@@ -2,9 +2,9 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import type { Alternative } from '@/domain/services/AlternativeFinder';
-import { money } from '@/domain/value-objects/Money';
-import { ConflictPanel, type ConflictPanelProps } from '@/presentation/components/ConflictPanel';
+import type { Alternative } from '@/src/domain/services/AlternativeFinder';
+import { money } from '@/src/domain/value-objects/Money';
+import { ConflictPanel, type ConflictPanelProps } from '@/src/components/booking/ConflictPanel';
 import { makeBooking, makeCar, range } from '../fixtures';
 
 function alternative(id: string, name: string, dailyRateCents: number): Alternative {

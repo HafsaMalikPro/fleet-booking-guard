@@ -1,6 +1,6 @@
-import type { BookingRepository, NewBooking } from '@/application/ports/BookingRepository';
-import type { Booking } from '@/domain/entities/Booking';
-import { overlaps } from '@/domain/value-objects/DateRange';
+import type { BookingRepository, NewBooking } from '@/src/application/ports/BookingRepository';
+import type { Booking } from '@/src/domain/entities/Booking';
+import { overlaps } from '@/src/domain/value-objects/DateRange';
 
 export class InMemoryBookingRepository implements BookingRepository {
   private readonly bookings = new Map<string, Booking>();

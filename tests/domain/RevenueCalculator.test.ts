@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { protectedRevenue } from '@/domain/services/RevenueCalculator';
+import { protectedRevenue } from '@/src/domain/services/RevenueCalculator';
 import { makeCar, range } from '../fixtures';
 
 const cars = [

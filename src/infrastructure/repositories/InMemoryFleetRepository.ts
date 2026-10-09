@@ -1,5 +1,5 @@
-import type { FleetRepository } from '@/application/ports/FleetRepository';
-import type { Car } from '@/domain/entities/Car';
+import type { FleetRepository } from '@/src/application/ports/FleetRepository';
+import type { Car } from '@/src/domain/entities/Car';
 
 export class InMemoryFleetRepository implements FleetRepository {
   private readonly cars: Map<string, Car>;

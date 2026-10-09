@@ -11,6 +11,11 @@
     background-repeat: no-repeat;
   }
 
+  h1,
+  h2 {
+    @apply font-display;
+  }
+
   ::selection {
     @apply bg-brand-200 text-ink;
   }

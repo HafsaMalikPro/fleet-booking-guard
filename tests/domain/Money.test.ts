@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { InvalidMoneyError } from '@/domain/errors/DomainError';
-import { addMoney, money, multiplyMoney, toDecimal } from '@/domain/value-objects/Money';
+import { InvalidMoneyError } from '@/src/domain/errors/DomainError';
+import { addMoney, money, multiplyMoney, toDecimal } from '@/src/domain/value-objects/Money';
 
 describe('Money', () => {
   it('only accepts integer cents', () => {

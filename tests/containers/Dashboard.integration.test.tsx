@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
-import { AppHeader } from '@/presentation/containers/AppHeader';
-import { Dashboard } from '@/presentation/containers/Dashboard';
-import { FleetProvider } from '@/presentation/context/FleetProvider';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { AppHeader } from '@/src/containers/home/AppHeader';
+import { Dashboard } from '@/src/containers/home/Dashboard';
+import { FleetProvider } from '@/src/context/FleetProvider';
 
 function renderApp() {
   render(
@@ -36,5 +36,37 @@ describe('Dashboard (integration with the real composition root)', () => {
     expect(
       screen.queryByRole('status', { name: /revenue protected: \$0\.00/i }),
     ).not.toBeInTheDocument();
+
+    // The new booking is highlighted on the timeline, and the confirmation links to it.
+    expect(screen.getByRole('img', { name: /^new booking:/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'View on timeline' })).toBeInTheDocument();
+  });
+
+  it('pages the timeline forward to show a booking made outside the current window', async () => {
+    // Pin the clock early in a month so there is room to page within it.
+    vi.useFakeTimers({ toFake: ['Date'], shouldAdvanceTime: true });
+    vi.setSystemTime(new Date(2026, 9, 9, 15));
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
+    const user = renderApp();
+    expect(await screen.findByText('Fleet timeline')).toBeInTheDocument();
+
+    // Book the Sprinter 20 days out: beyond the first 14-day window.
+    await user.selectOptions(screen.getByLabelText('Car'), 'Mercedes Sprinter · $189.00/day');
+    for (const field of ['Pickup', 'Return'] as const) {
+      await user.click(screen.getByLabelText(field));
+      await user.keyboard('{ArrowDown}{ArrowDown}{ArrowRight>5/}'); // +19 days
+      await user.keyboard('{Enter}{Escape}');
+    }
+    await user.click(screen.getByRole('button', { name: /check & book/i }));
+
+    expect(await screen.findByText('Booking confirmed')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /^new booking:/i })).toBeInTheDocument();
+    // The timeline moved off its first window to reach it.
+    expect(screen.getByRole('button', { name: 'Previous week' })).toBeEnabled();
+    // ...but never past the end of the month: Oct 18 – Oct 31.
+    expect(screen.getByText('Oct 18 – Oct 31, 2026')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Next week' })).toBeDisabled();
   });
 });

@@ -5,10 +5,10 @@ import type {
   CreateBookingInput,
   CreateBookingOutcome,
   ValidationError,
-} from '@/application/dto/BookingDto';
-import type { Booking } from '@/domain/entities/Booking';
-import type { DateRange } from '@/domain/value-objects/DateRange';
-import { useFleet } from '../context/FleetProvider';
+} from '@/src/application/dto/BookingDto';
+import type { Booking } from '@/src/domain/entities/Booking';
+import type { DateRange } from '@/src/domain/value-objects/DateRange';
+import { useFleet } from '@/src/context/FleetProvider';
 
 type ConflictOutcome = Extract<CreateBookingOutcome, { status: 'conflict' }>;
 

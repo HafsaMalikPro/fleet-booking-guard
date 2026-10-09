@@ -2,7 +2,7 @@
 
 import { ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
-import { formatCurrency } from '@/lib/formatCurrency';
+import { formatCurrency } from '@/src/lib/formatCurrency';
 
 export function RevenueBadge({ cents }: { cents: number }) {
   const [previous, setPrevious] = useState(cents);

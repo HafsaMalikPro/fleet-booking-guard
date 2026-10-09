@@ -1,5 +1,5 @@
-import { Logo } from './LogoMark';
-import { RevenueBadge } from './RevenueBadge';
+import { Logo } from '@/src/components/navigation/LogoMark';
+import { RevenueBadge } from '@/src/components/navigation/RevenueBadge';
 
 export function Header({ revenueCents }: { revenueCents: number }) {
   return (

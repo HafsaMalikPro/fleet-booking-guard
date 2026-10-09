@@ -1,5 +1,5 @@
-import type { BookingRequest } from '@/domain/entities/BookingRequest';
-import { find, type AlternativesResult } from '@/domain/services/AlternativeFinder';
+import type { BookingRequest } from '@/src/domain/entities/BookingRequest';
+import { find, type AlternativesResult } from '@/src/domain/services/AlternativeFinder';
 import type { BookingRepository } from '../ports/BookingRepository';
 import type { FleetRepository } from '../ports/FleetRepository';
 

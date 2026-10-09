@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { DomainError, InvalidDateRangeError } from '@/domain/errors/DomainError';
+import { DomainError, InvalidDateRangeError } from '@/src/domain/errors/DomainError';
 import {
   createDateRange,
   durationDaysCeil,
   extendEnd,
   overlaps,
-} from '@/domain/value-objects/DateRange';
+} from '@/src/domain/value-objects/DateRange';
 import { at, range } from '../fixtures';
 
 describe('DateRange', () => {

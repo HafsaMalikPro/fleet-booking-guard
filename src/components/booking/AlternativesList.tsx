@@ -1,8 +1,8 @@
 import { ArrowRight, Car as CarIcon } from 'lucide-react';
-import type { Alternative } from '@/domain/services/AlternativeFinder';
-import { formatCurrency } from '@/lib/formatCurrency';
-import { Badge } from './Badge';
-import { IconChip } from './IconChip';
+import type { Alternative } from '@/src/domain/services/AlternativeFinder';
+import { formatCurrency } from '@/src/lib/formatCurrency';
+import { Badge } from '@/src/components/common/Badge';
+import { IconChip } from '@/src/components/common/IconChip';
 
 export interface AlternativesListProps {
   alternatives: readonly Alternative[];

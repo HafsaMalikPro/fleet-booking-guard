@@ -1,4 +1,4 @@
-import type { BookingRequest } from '@/domain/entities/BookingRequest';
+import type { BookingRequest } from '@/src/domain/entities/BookingRequest';
 
 /** Tracks requests blocked by a conflict and those recovered via an alternative. */
 export interface RevenueLedger {

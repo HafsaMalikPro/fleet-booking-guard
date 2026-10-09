@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { find } from '@/domain/services/AlternativeFinder';
+import { find } from '@/src/domain/services/AlternativeFinder';
 import { at, makeBooking, makeCar, range } from '../fixtures';
 
 const cars = [

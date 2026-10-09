@@ -1,15 +1,17 @@
-import { CheckCircle2, X } from 'lucide-react';
-import { formatShortRange } from '@/lib/formatDate';
-import type { DateRange } from '@/domain/value-objects/DateRange';
-import { Badge } from './Badge';
-import { Button } from './Button';
-import { Card } from './Card';
+import { CalendarRange, CheckCircle2, X } from 'lucide-react';
+import { formatShortRange } from '@/src/lib/formatDate';
+import type { DateRange } from '@/src/domain/value-objects/DateRange';
+import { Badge } from '@/src/components/common/Badge';
+import { Button } from '@/src/components/common/Button';
+import { Card } from '@/src/components/common/Card';
 
 export interface BookingConfirmationProps {
   carName: string;
   customerName: string;
   range: DateRange;
   viaAlternative: boolean;
+  /** Pages the timeline to the new booking and scrolls to it. */
+  onViewOnTimeline?: () => void;
   onDismiss: () => void;
 }
 
@@ -18,6 +20,7 @@ export function BookingConfirmation({
   customerName,
   range,
   viaAlternative,
+  onViewOnTimeline,
   onDismiss,
 }: BookingConfirmationProps) {
   return (
@@ -32,6 +35,16 @@ export function BookingConfirmation({
         <p className="mt-1 text-sm text-ink/65">
           {carName} for {customerName} · {formatShortRange(range.start, range.end)}
         </p>
+        {onViewOnTimeline && (
+          <button
+            type="button"
+            onClick={onViewOnTimeline}
+            className="focus-ring mt-2 inline-flex items-center gap-1.5 rounded-full text-xs font-semibold text-brand-600 hover:text-brand-700"
+          >
+            <CalendarRange className="h-3.5 w-3.5" aria-hidden="true" />
+            View on timeline
+          </button>
+        )}
       </div>
       <Button variant="ghost" size="sm" onClick={onDismiss} aria-label="Dismiss confirmation">
         <X className="h-4 w-4" aria-hidden="true" />

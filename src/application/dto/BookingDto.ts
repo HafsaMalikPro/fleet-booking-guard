@@ -1,8 +1,8 @@
-import type { Booking } from '@/domain/entities/Booking';
-import type { Car } from '@/domain/entities/Car';
-import type { Alternative } from '@/domain/services/AlternativeFinder';
-import type { DateRange } from '@/domain/value-objects/DateRange';
-import type { Money } from '@/domain/value-objects/Money';
+import type { Booking } from '@/src/domain/entities/Booking';
+import type { Car } from '@/src/domain/entities/Car';
+import type { Alternative } from '@/src/domain/services/AlternativeFinder';
+import type { DateRange } from '@/src/domain/value-objects/DateRange';
+import type { Money } from '@/src/domain/value-objects/Money';
 
 /** Raw form input. Dates are `datetime-local` strings (local time). */
 export interface CreateBookingInput {

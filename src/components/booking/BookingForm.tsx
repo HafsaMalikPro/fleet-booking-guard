@@ -1,18 +1,20 @@
 'use client';
 
+import { startOfDay } from 'date-fns';
 import { ArrowRight, CalendarClock } from 'lucide-react';
 import { useId, useState, type FormEvent } from 'react';
 import type {
   CreateBookingInput,
   ValidationError,
   ValidationField,
-} from '@/application/dto/BookingDto';
-import type { Car } from '@/domain/entities/Car';
-import { cn } from '@/lib/cn';
-import { formatCurrency } from '@/lib/formatCurrency';
-import { Button } from './Button';
-import { Card } from './Card';
-import { IconChip } from './IconChip';
+} from '@/src/application/dto/BookingDto';
+import type { Car } from '@/src/domain/entities/Car';
+import { cn } from '@/src/lib/cn';
+import { formatCurrency } from '@/src/lib/formatCurrency';
+import { Button } from '@/src/components/common/Button';
+import { DateTimePicker } from '@/src/components/common/DateTimePicker';
+import { Card } from '@/src/components/common/Card';
+import { IconChip } from '@/src/components/common/IconChip';
 
 export interface BookingFormDefaults {
   carId: string;
@@ -119,6 +121,7 @@ export function BookingForm({
     bufferHours: `${uid}-buffer`,
     customerName: `${uid}-customer`,
   };
+  const pickupDate = values.pickup ? new Date(values.pickup) : null;
   const describedBy = (field: ValidationField) =>
     errors[field] ? `${ids[field]}-error` : undefined;
 
@@ -166,14 +169,15 @@ export function BookingForm({
           <label htmlFor={ids.pickup} className={labelClass}>
             Pickup
           </label>
-          <input
+          <DateTimePicker
             id={ids.pickup}
-            type="datetime-local"
             value={values.pickup}
-            onChange={(e) => update('pickup')(e.target.value)}
-            aria-invalid={Boolean(errors.pickup)}
-            aria-describedby={describedBy('pickup')}
-            className={cn(inputClass, errors.pickup && invalidClass)}
+            onChange={update('pickup')}
+            minDate={startOfDay(new Date())}
+            rangeStart={values.pickup}
+            rangeEnd={values.returnAt}
+            invalid={Boolean(errors.pickup)}
+            describedBy={describedBy('pickup')}
           />
           <FieldError id={`${ids.pickup}-error`} message={errors.pickup} />
         </div>
@@ -182,14 +186,15 @@ export function BookingForm({
           <label htmlFor={ids.returnAt} className={labelClass}>
             Return
           </label>
-          <input
+          <DateTimePicker
             id={ids.returnAt}
-            type="datetime-local"
             value={values.returnAt}
-            onChange={(e) => update('returnAt')(e.target.value)}
-            aria-invalid={Boolean(errors.returnAt)}
-            aria-describedby={describedBy('returnAt')}
-            className={cn(inputClass, errors.returnAt && invalidClass)}
+            onChange={update('returnAt')}
+            minDate={pickupDate ?? undefined}
+            rangeStart={values.pickup}
+            rangeEnd={values.returnAt}
+            invalid={Boolean(errors.returnAt)}
+            describedBy={describedBy('returnAt')}
           />
           <FieldError id={`${ids.returnAt}-error`} message={errors.returnAt} />
         </div>

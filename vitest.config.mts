@@ -5,11 +5,13 @@ import { fileURLToPath } from 'node:url';
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    alias: { '@': fileURLToPath(new URL('./', import.meta.url)) },
   },
   test: {
     environment: 'node', // component tests opt into jsdom with a docblock
     globals: true,
+    // UI tests drive real user-event flows; 5s is too tight when files run in parallel.
+    testTimeout: 15_000,
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.test.{ts,tsx}'],
     coverage: {

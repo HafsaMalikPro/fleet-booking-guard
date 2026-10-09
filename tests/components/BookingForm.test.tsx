@@ -2,7 +2,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { BookingForm, type BookingFormDefaults } from '@/presentation/components/BookingForm';
+import { BookingForm, type BookingFormDefaults } from '@/src/components/booking/BookingForm';
 import { makeCar } from '../fixtures';
 
 const cars = [
@@ -26,22 +26,29 @@ describe('BookingForm', () => {
   it('shows an inline error next to the return field when return is before pickup', async () => {
     const { onSubmit, user } = setup();
 
-    fireEvent.change(screen.getByLabelText('Return'), { target: { value: '2030-01-09T10:00' } });
+    // Same day as pickup (Jan 10, 10:00) but an earlier time.
+    await user.click(screen.getByLabelText('Return'));
+    await user.click(screen.getByRole('button', { name: 'Thursday, January 10, 2030' }));
+    await user.click(screen.getByRole('option', { name: '9:00 AM' }));
     await user.click(screen.getByRole('button', { name: /check & book/i }));
 
-    const returnInput = screen.getByLabelText('Return');
-    expect(returnInput).toHaveAttribute('aria-invalid', 'true');
-    expect(returnInput).toHaveAccessibleDescription('Return must be after pickup.');
+    const returnField = screen.getByLabelText('Return');
+    expect(returnField).toHaveAttribute('aria-invalid', 'true');
+    expect(returnField).toHaveAccessibleDescription('Return must be after pickup.');
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
   it('clears the error once the user fixes the return time', async () => {
     const { user } = setup();
-    const returnInput = screen.getByLabelText('Return');
 
-    fireEvent.change(returnInput, { target: { value: '2030-01-09T10:00' } });
+    await user.click(screen.getByLabelText('Return'));
+    await user.click(screen.getByRole('button', { name: 'Thursday, January 10, 2030' }));
+    await user.click(screen.getByRole('option', { name: '9:00 AM' }));
     await user.click(screen.getByRole('button', { name: /check & book/i }));
-    fireEvent.change(returnInput, { target: { value: '2030-01-11T10:00' } });
+    expect(screen.getByText('Return must be after pickup.')).toBeInTheDocument();
+
+    await user.click(screen.getByLabelText('Return'));
+    await user.click(screen.getByRole('button', { name: 'Friday, January 11, 2030' }));
 
     expect(screen.queryByText('Return must be after pickup.')).not.toBeInTheDocument();
   });
@@ -63,6 +70,52 @@ describe('BookingForm', () => {
       bufferHours: 6,
       customerName: 'Alex Morgan',
     });
+  });
+
+  it('submits the date and time picked in the calendar', async () => {
+    const { onSubmit, user } = setup();
+
+    await user.click(screen.getByLabelText('Return'));
+    await user.click(screen.getByRole('button', { name: 'Tuesday, January 15, 2030' }));
+    await user.click(screen.getByRole('option', { name: '2:30 PM' }));
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Return')).toHaveTextContent('Tue, Jan 15, 2030 · 2:30 PM');
+
+    await user.click(screen.getByRole('button', { name: /check & book/i }));
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ returnAt: '2030-01-15T14:30' }),
+    );
+  });
+
+  it('blocks return days before pickup', async () => {
+    const { user } = setup();
+
+    await user.click(screen.getByLabelText('Return'));
+    const blocked = screen.getByRole('button', { name: 'Wednesday, January 9, 2030' });
+    expect(blocked).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Thursday, January 10, 2030' })).not.toHaveAttribute(
+      'aria-disabled',
+    );
+
+    await user.click(blocked);
+    expect(screen.getByLabelText('Return')).toHaveTextContent('Sat, Jan 12, 2030');
+  });
+
+  it('supports keyboard navigation and closes on Escape', async () => {
+    const { user } = setup();
+
+    await user.click(screen.getByLabelText('Return'));
+    await user.click(screen.getByRole('button', { name: 'Saturday, January 12, 2030' }));
+    await user.keyboard('{ArrowRight}{Enter}');
+    expect(screen.getByLabelText('Return')).toHaveTextContent('Sun, Jan 13, 2030');
+
+    await user.keyboard('{PageDown}');
+    expect(screen.getByRole('grid', { name: 'February 2030' })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Return')).toHaveFocus();
   });
 
   it('rejects a negative buffer and reports the blocked submit via onInvalid', async () => {

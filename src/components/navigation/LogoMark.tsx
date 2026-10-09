@@ -1,4 +1,4 @@
-import { cn } from '@/lib/cn';
+import { cn } from '@/src/lib/cn';
 
 // Paths from the official 1Now logo (framerusercontent.com/images/5pwMpBRQW9pb47knnj4IhtTvNE.svg),
 // split into the car-roof mark and the "1NOW" wordmark.

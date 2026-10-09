@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { describe, expect, it } from 'vitest';
-import type { CreateBookingInput } from '@/application/dto/BookingDto';
+import type { CreateBookingInput } from '@/src/application/dto/BookingDto';
 import { at, makeBooking, makeCar, range } from '../fixtures';
 import { buildUseCases } from './fakes';
 

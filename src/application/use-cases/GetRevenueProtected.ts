@@ -1,5 +1,5 @@
-import { protectedRevenue } from '@/domain/services/RevenueCalculator';
-import type { Money } from '@/domain/value-objects/Money';
+import { protectedRevenue } from '@/src/domain/services/RevenueCalculator';
+import type { Money } from '@/src/domain/value-objects/Money';
 import type { FleetRepository } from '../ports/FleetRepository';
 import type { RevenueLedger } from '../ports/RevenueLedger';
 

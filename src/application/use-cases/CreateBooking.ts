@@ -1,6 +1,6 @@
 import { isValid, parseISO } from 'date-fns';
-import { findConflicts } from '@/domain/services/ConflictDetector';
-import { createDateRange, type DateRange } from '@/domain/value-objects/DateRange';
+import { findConflicts } from '@/src/domain/services/ConflictDetector';
+import { createDateRange, type DateRange } from '@/src/domain/value-objects/DateRange';
 import type {
   CreateBookingInput,
   CreateBookingOutcome,

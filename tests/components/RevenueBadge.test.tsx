@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { RevenueBadge } from '@/presentation/components/RevenueBadge';
+import { RevenueBadge } from '@/src/components/navigation/RevenueBadge';
 
 describe('RevenueBadge', () => {
   it('displays the protected revenue as formatted currency', () => {

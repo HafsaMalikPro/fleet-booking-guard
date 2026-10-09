@@ -1,15 +1,15 @@
-import type { BookingRepository, NewBooking } from '@/application/ports/BookingRepository';
-import type { FleetRepository } from '@/application/ports/FleetRepository';
-import type { RevenueLedger } from '@/application/ports/RevenueLedger';
-import { AcceptAlternative } from '@/application/use-cases/AcceptAlternative';
-import { CreateBooking } from '@/application/use-cases/CreateBooking';
-import { FindAlternatives } from '@/application/use-cases/FindAlternatives';
-import { GetFleetCalendar } from '@/application/use-cases/GetFleetCalendar';
-import { GetRevenueProtected } from '@/application/use-cases/GetRevenueProtected';
-import type { Booking } from '@/domain/entities/Booking';
-import type { BookingRequest } from '@/domain/entities/BookingRequest';
-import type { Car } from '@/domain/entities/Car';
-import { overlaps } from '@/domain/value-objects/DateRange';
+import type { BookingRepository, NewBooking } from '@/src/application/ports/BookingRepository';
+import type { FleetRepository } from '@/src/application/ports/FleetRepository';
+import type { RevenueLedger } from '@/src/application/ports/RevenueLedger';
+import { AcceptAlternative } from '@/src/application/use-cases/AcceptAlternative';
+import { CreateBooking } from '@/src/application/use-cases/CreateBooking';
+import { FindAlternatives } from '@/src/application/use-cases/FindAlternatives';
+import { GetFleetCalendar } from '@/src/application/use-cases/GetFleetCalendar';
+import { GetRevenueProtected } from '@/src/application/use-cases/GetRevenueProtected';
+import type { Booking } from '@/src/domain/entities/Booking';
+import type { BookingRequest } from '@/src/domain/entities/BookingRequest';
+import type { Car } from '@/src/domain/entities/Car';
+import { overlaps } from '@/src/domain/value-objects/DateRange';
 
 export class FakeFleet implements FleetRepository {
   constructor(private readonly cars: Car[]) {}

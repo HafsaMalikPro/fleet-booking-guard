@@ -1,6 +1,6 @@
 import { CarFront } from 'lucide-react';
-import { Card } from './Card';
-import { IconChip } from './IconChip';
+import { Card } from '@/src/components/common/Card';
+import { IconChip } from '@/src/components/common/IconChip';
 
 export function LoadingCard({ label, className }: { label: string; className?: string }) {
   return (

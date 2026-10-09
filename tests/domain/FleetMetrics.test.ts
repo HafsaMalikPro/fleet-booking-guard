@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { utilization } from '@/domain/services/FleetMetrics';
+import { utilization } from '@/src/domain/services/FleetMetrics';
 import { makeBooking, range } from '../fixtures';
 
 describe('FleetMetrics.utilization', () => {

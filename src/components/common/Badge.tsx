@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@/src/lib/cn';
 
 export type BadgeTone = 'clear' | 'conflict' | 'buffer' | 'neutral' | 'live';
 

@@ -1,5 +1,5 @@
-import type { RevenueLedger } from '@/application/ports/RevenueLedger';
-import type { BookingRequest } from '@/domain/entities/BookingRequest';
+import type { RevenueLedger } from '@/src/application/ports/RevenueLedger';
+import type { BookingRequest } from '@/src/domain/entities/BookingRequest';
 
 export class InMemoryRevenueLedger implements RevenueLedger {
   private readonly blocked: BookingRequest[] = [];

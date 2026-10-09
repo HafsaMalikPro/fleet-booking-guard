@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findConflicts } from '@/domain/services/ConflictDetector';
+import { findConflicts } from '@/src/domain/services/ConflictDetector';
 import { makeBooking, range } from '../fixtures';
 
 const existing = makeBooking({ id: 'b1', carId: 'car-a', range: range(0, 24) });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GetFleetSummary } from '@/application/use-cases/GetFleetSummary';
+import { GetFleetSummary } from '@/src/application/use-cases/GetFleetSummary';
 import { at, makeBooking, makeCar, range } from '../fixtures';
 import { FakeBookings, FakeFleet, FakeLedger } from './fakes';
 

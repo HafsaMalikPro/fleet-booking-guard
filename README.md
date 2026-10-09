@@ -25,14 +25,16 @@ Requires Node 18.18+ (developed on Node 22).
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
 │ app/              Next.js routes only (layout.tsx, page.tsx)         │
+│                   page.tsx re-exports src/containers/home            │
 └──────────────┬───────────────────────────────────────────────────────┘
                ▼
 ┌──────────────────────────────────────────────────────────────────────┐
-│ presentation/     React                                              │
+│ src/ (UI)         React                                              │
 │   context/FleetProvider.tsx  ← composition root (wires infra → UCs)  │
-│   containers/                ← Dashboard, AppHeader: hooks → props   │
+│   containers/home/           ← page + Dashboard, AppHeader           │
 │   hooks/                     ← thin: call a use case, hold UI state  │
-│   components/                ← presentational, props + callbacks     │
+│   components/<feature>/      ← common, navigation, booking, fleet    │
+│   constants/ · lib/          ← static copy, formatting helpers       │
 └──────────────┬───────────────────────────────────────────────────────┘
                ▼
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -60,11 +62,11 @@ Dependencies only point inward. **Why separate the layers?**
 I added two small things to the suggested structure:
 
 - `application/ports/RevenueLedger.ts`, because blocked and protected requests need somewhere to live behind an interface.
-- `presentation/containers/`, which keeps hooks out of presentational components and keeps `page.tsx` thin.
+- `src/containers/`, which keeps hooks out of presentational components and keeps `page.tsx` thin.
 
 ## UI
 
-The look follows 1Now's site: their coral (`#FE7743`), navy headings, pill buttons with an orange glow, and white cards with soft shadows. The 1NOW logo is the official SVG path, inlined (`presentation/components/LogoMark.tsx`), and the favicon is `app/icon.svg`. Under the hero, a "Fleet · next 14 days" card shows revenue protected, utilization, bookings in view and conflicts blocked. Utilization is computed in the domain (`FleetMetrics`), not in the component.
+The look follows 1Now's site: their coral (`#FE7743`), navy headings, pill buttons with an orange glow, and white cards with soft shadows. The 1NOW logo is the official SVG path, inlined (`src/components/navigation/LogoMark.tsx`), and the favicon is `app/icon.svg`. Under the hero, a "Fleet · next 14 days" card shows revenue protected, utilization, bookings in view and conflicts blocked. Utilization is computed in the domain (`FleetMetrics`), not in the component.
 
 ## Domain rules
 
@@ -90,7 +92,7 @@ The look follows 1Now's site: their coral (`#FE7743`), navy headings, pill butto
 
 - **Domain (`tests/domain/`)** covers each rule at its edges: half-open adjacency, containment, a 2-hour gap with 4h vs 0h buffer, the buffer applied _before_ an existing pickup, cancelled bookings, other cars, rounding partial days up, and exact cent arithmetic.
 - **Application (`tests/application/`)** runs the use cases against hand-written fakes (`tests/application/fakes.ts`), never the seed. These tests check what gets saved and what gets recorded in the ledger.
-- **Presentation (`tests/presentation/`)** uses React Testing Library with user-event and checks behaviour through accessible roles and labels: inline validation tied to the field via `aria-describedby`, price ordering, and callback payloads. One integration test renders the real composition root and goes through blocked → accept cheapest alternative → confirmed → revenue counter changes.
+- **UI (`tests/components/`, `tests/containers/`)** uses React Testing Library with user-event and checks behaviour through accessible roles and labels: inline validation tied to the field via `aria-describedby`, price ordering, and callback payloads. One integration test renders the real composition root and goes through blocked → accept cheapest alternative → confirmed → revenue counter changes.
 - **Infrastructure (`tests/infrastructure/`)** checks that the seed itself is consistent (no confirmed booking conflicts under a 4h buffer).
 
 Pure logic tests run in the `node` environment. Component tests opt into `jsdom` with a docblock, which keeps the suite fast.

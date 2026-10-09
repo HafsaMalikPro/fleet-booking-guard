@@ -1,7 +1,7 @@
-import { addDays, addHours, setHours, startOfDay } from 'date-fns';
-import type { Booking, BookingStatus } from '@/domain/entities/Booking';
-import type { Car } from '@/domain/entities/Car';
-import { createDateRange } from '@/domain/value-objects/DateRange';
+import { addDays, addHours, endOfMonth, isAfter, setHours, startOfDay } from 'date-fns';
+import type { Booking, BookingStatus } from '@/src/domain/entities/Booking';
+import type { Car } from '@/src/domain/entities/Car';
+import { createDateRange } from '@/src/domain/value-objects/DateRange';
 
 export const SEED_CARS: readonly Car[] = [
   {
@@ -81,9 +81,13 @@ const ROWS: readonly SeedRow[] = [
   ['car-sprinter', 7, 8, 48, 'Riverside Events Co.'],
 ];
 
-/** Builds bookings relative to `now` so the demo always shows the next 30 days. */
+/**
+ * Builds bookings relative to `now`, keeping only those that finish within the current
+ * month, so the demo never shows bookings in later months.
+ */
 export function createSeed(now: Date): { cars: Car[]; bookings: Booking[] } {
   const today = startOfDay(now);
+  const monthEnd = endOfMonth(now);
   const bookings = ROWS.map(([carId, day, hour, hours, customerName, status], index) => {
     const start = setHours(addDays(today, day), hour);
     return {
@@ -92,7 +96,7 @@ export function createSeed(now: Date): { cars: Car[]; bookings: Booking[] } {
       customerName,
       status: status ?? 'confirmed',
       range: createDateRange(start, addHours(start, hours)),
-    };
-  });
+    } satisfies Booking;
+  }).filter((booking) => !isAfter(booking.range.end, monthEnd));
   return { cars: [...SEED_CARS], bookings };
 }

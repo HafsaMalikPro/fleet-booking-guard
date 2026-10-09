@@ -1,4 +1,4 @@
-import type { Car } from '@/domain/entities/Car';
+import type { Car } from '@/src/domain/entities/Car';
 
 export interface FleetRepository {
   listCars(): Car[];

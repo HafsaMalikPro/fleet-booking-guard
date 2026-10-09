@@ -1,13 +1,13 @@
 import { AlertTriangle, CalendarCheck, X } from 'lucide-react';
-import type { Booking } from '@/domain/entities/Booking';
-import type { Alternative } from '@/domain/services/AlternativeFinder';
-import type { DateRange } from '@/domain/value-objects/DateRange';
-import { formatShortRange } from '@/lib/formatDate';
-import { AlternativesList } from './AlternativesList';
-import { Badge } from './Badge';
-import { Button } from './Button';
-import { Card } from './Card';
-import { IconChip } from './IconChip';
+import type { Booking } from '@/src/domain/entities/Booking';
+import type { Alternative } from '@/src/domain/services/AlternativeFinder';
+import type { DateRange } from '@/src/domain/value-objects/DateRange';
+import { formatShortRange } from '@/src/lib/formatDate';
+import { AlternativesList } from '@/src/components/booking/AlternativesList';
+import { Badge } from '@/src/components/common/Badge';
+import { Button } from '@/src/components/common/Button';
+import { Card } from '@/src/components/common/Card';
+import { IconChip } from '@/src/components/common/IconChip';
 
 export interface ConflictPanelProps {
   carName: string;

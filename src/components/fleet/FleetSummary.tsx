@@ -1,8 +1,8 @@
 import { CalendarCheck2, ShieldAlert, TrendingUp } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { formatCurrency } from '@/lib/formatCurrency';
-import { Badge } from './Badge';
-import { Card } from './Card';
+import { formatCurrency } from '@/src/lib/formatCurrency';
+import { Badge } from '@/src/components/common/Badge';
+import { Card } from '@/src/components/common/Card';
 
 export interface FleetSummaryProps {
   windowLabel: string;

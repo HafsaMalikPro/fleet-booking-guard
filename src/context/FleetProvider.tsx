@@ -1,16 +1,16 @@
 'use client';
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import { AcceptAlternative } from '@/application/use-cases/AcceptAlternative';
-import { CreateBooking } from '@/application/use-cases/CreateBooking';
-import { FindAlternatives } from '@/application/use-cases/FindAlternatives';
-import { GetFleetCalendar } from '@/application/use-cases/GetFleetCalendar';
-import { GetFleetSummary } from '@/application/use-cases/GetFleetSummary';
-import { GetRevenueProtected } from '@/application/use-cases/GetRevenueProtected';
-import { InMemoryBookingRepository } from '@/infrastructure/repositories/InMemoryBookingRepository';
-import { InMemoryFleetRepository } from '@/infrastructure/repositories/InMemoryFleetRepository';
-import { InMemoryRevenueLedger } from '@/infrastructure/repositories/InMemoryRevenueLedger';
-import { createSeed } from '@/infrastructure/seed/seed';
+import { AcceptAlternative } from '@/src/application/use-cases/AcceptAlternative';
+import { CreateBooking } from '@/src/application/use-cases/CreateBooking';
+import { FindAlternatives } from '@/src/application/use-cases/FindAlternatives';
+import { GetFleetCalendar } from '@/src/application/use-cases/GetFleetCalendar';
+import { GetFleetSummary } from '@/src/application/use-cases/GetFleetSummary';
+import { GetRevenueProtected } from '@/src/application/use-cases/GetRevenueProtected';
+import { InMemoryBookingRepository } from '@/src/infrastructure/repositories/InMemoryBookingRepository';
+import { InMemoryFleetRepository } from '@/src/infrastructure/repositories/InMemoryFleetRepository';
+import { InMemoryRevenueLedger } from '@/src/infrastructure/repositories/InMemoryRevenueLedger';
+import { createSeed } from '@/src/infrastructure/seed/seed';
 
 export interface FleetServices {
   readonly getFleetCalendar: GetFleetCalendar;

@@ -1,4 +1,4 @@
-import type { Booking } from '@/domain/entities/Booking';
+import type { Booking } from '@/src/domain/entities/Booking';
 
 export type NewBooking = Omit<Booking, 'id'>;
 
