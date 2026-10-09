@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-canvas text-ink;
+    background-image:
+      radial-gradient(40rem 28rem at 0% 0%, rgba(255, 122, 69, 0.14), transparent 70%),
+      radial-gradient(36rem 26rem at 100% 0%, rgba(255, 122, 69, 0.1), transparent 70%),
+      radial-gradient(32rem 24rem at 100% 100%, rgba(255, 122, 69, 0.08), transparent 70%);
+    background-attachment: fixed;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-canvas;
+  }
+}
+
+@layer components {
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2;
+  }
+
+  .buffer-stripes {
+    background-color: #ffe6d9;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgba(255, 122, 69, 0.35) 0 4px,
+      transparent 4px 8px
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
