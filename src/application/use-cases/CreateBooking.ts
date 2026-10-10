@@ -1,4 +1,4 @@
-import { isValid, parseISO } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import { findConflicts } from '@/src/domain/services/ConflictDetector';
 import { createDateRange, type DateRange } from '@/src/domain/value-objects/DateRange';
 import type {
@@ -28,6 +28,8 @@ interface ValidRequest {
 export function validateBookingInput(
   input: CreateBookingInput,
   carExists: (id: string) => boolean,
+  /** Latest allowed return; bookings past it are outside the bookable horizon. */
+  latestEnd?: Date,
 ): Result<ValidRequest, ValidationError> {
   if (!input.carId || !carExists(input.carId)) {
     return err(invalid('carId', 'Select a car from the fleet.'));
@@ -37,6 +39,9 @@ export function validateBookingInput(
   const returnAt = parseISO(input.returnAt);
   if (!isValid(returnAt)) return err(invalid('returnAt', 'Enter a valid return date and time.'));
   if (returnAt <= pickup) return err(invalid('returnAt', 'Return must be after pickup.'));
+  if (latestEnd && returnAt > latestEnd) {
+    return err(invalid('returnAt', `Return must be on or before ${format(latestEnd, 'MMM d')}.`));
+  }
   if (!Number.isFinite(input.bufferHours) || input.bufferHours < 0) {
     return err(invalid('bufferHours', 'Buffer must be zero or more hours.'));
   }
@@ -53,10 +58,15 @@ export class CreateBooking {
     private readonly bookings: BookingRepository,
     private readonly ledger: RevenueLedger,
     private readonly findAlternatives: FindAlternatives,
+    private readonly latestEnd?: Date,
   ) {}
 
   execute(input: CreateBookingInput): Result<CreateBookingOutcome, ValidationError> {
-    const validated = validateBookingInput(input, (id) => this.fleet.getCar(id) !== undefined);
+    const validated = validateBookingInput(
+      input,
+      (id) => this.fleet.getCar(id) !== undefined,
+      this.latestEnd,
+    );
     if (!validated.ok) return validated;
 
     const { carId, range, bufferHours } = validated.value;

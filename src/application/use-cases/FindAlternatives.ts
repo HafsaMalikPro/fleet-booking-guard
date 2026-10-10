@@ -7,9 +7,16 @@ export class FindAlternatives {
   constructor(
     private readonly fleet: FleetRepository,
     private readonly bookings: BookingRepository,
+    private readonly latestEnd?: Date,
   ) {}
 
   execute(request: BookingRequest, bufferHours: number): AlternativesResult {
-    return find(request, this.fleet.listCars(), this.bookings.listAll(), bufferHours);
+    return find(
+      request,
+      this.fleet.listCars(),
+      this.bookings.listAll(),
+      bufferHours,
+      this.latestEnd,
+    );
   }
 }

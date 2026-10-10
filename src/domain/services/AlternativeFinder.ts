@@ -50,6 +50,7 @@ function findNextFreeSlot(
   request: BookingRequest,
   bookings: readonly Booking[],
   bufferHours: number,
+  latestEnd?: Date,
 ): DateRange | null {
   const from = request.range.start.getTime();
   const limit = addDays(request.range.start, NEXT_SLOT_SEARCH_DAYS).getTime();
@@ -62,6 +63,7 @@ function findNextFreeSlot(
   for (const start of sorted) {
     if (start > limit) break;
     const slot = shiftTo(request.range, new Date(start));
+    if (latestEnd && slot.end > latestEnd) break;
     if (findConflicts({ carId: request.carId, range: slot }, bookings, bufferHours).length === 0) {
       return slot;
     }
@@ -74,10 +76,12 @@ export function find(
   cars: readonly Car[],
   bookings: readonly Booking[],
   bufferHours: number,
+  /** Slots ending after this are outside the bookable horizon. */
+  latestEnd?: Date,
 ): AlternativesResult {
   return {
     alternatives: findAlternativeCars(request, cars, bookings, bufferHours),
-    nextFreeSlot: findNextFreeSlot(request, bookings, bufferHours),
+    nextFreeSlot: findNextFreeSlot(request, bookings, bufferHours, latestEnd),
   };
 }
 

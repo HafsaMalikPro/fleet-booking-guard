@@ -15,7 +15,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${geist.variable}`}>
-      <body className="min-h-screen font-sans antialiased">
+      {/* Browser extensions (e.g. ColorZilla) add attributes to <body> before hydration. */}
+      <body className="min-h-screen font-sans antialiased" suppressHydrationWarning>
         <FleetProvider>{children}</FleetProvider>
       </body>
     </html>

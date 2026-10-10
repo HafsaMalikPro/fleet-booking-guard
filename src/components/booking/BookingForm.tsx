@@ -1,6 +1,6 @@
 'use client';
 
-import { startOfDay } from 'date-fns';
+import { endOfDay, format, startOfDay } from 'date-fns';
 import { ArrowRight, CalendarClock, CarFront } from 'lucide-react';
 import { useId, useState, type FormEvent } from 'react';
 import type {
@@ -32,6 +32,8 @@ export interface BookingFormProps {
   onInvalid?: () => void;
   /** Validation error returned by the use case, shown next to its field. */
   serverError?: ValidationError | null;
+  /** Last bookable day; later dates are disabled and rejected. */
+  maxDate?: Date;
 }
 
 type Errors = Partial<Record<ValidationField, string>>;
@@ -44,13 +46,15 @@ interface Values {
   customerName: string;
 }
 
-function validate(values: Values): Errors {
+function validate(values: Values, maxDate?: Date): Errors {
   const errors: Errors = {};
   if (!values.carId) errors.carId = 'Select a car.';
   if (!values.pickup) errors.pickup = 'Pickup date and time is required.';
   if (!values.returnAt) errors.returnAt = 'Return date and time is required.';
   if (values.pickup && values.returnAt && new Date(values.returnAt) <= new Date(values.pickup)) {
     errors.returnAt = 'Return must be after pickup.';
+  } else if (values.returnAt && maxDate && new Date(values.returnAt) > endOfDay(maxDate)) {
+    errors.returnAt = `Return must be on or before ${format(maxDate, 'MMM d')}.`;
   }
   const buffer = Number(values.bufferHours);
   if (values.bufferHours === '' || !Number.isFinite(buffer) || buffer < 0) {
@@ -79,6 +83,7 @@ export function BookingForm({
   onSubmit,
   onInvalid,
   serverError,
+  maxDate,
 }: BookingFormProps) {
   const uid = useId();
   const [values, setValues] = useState<Values>({
@@ -88,7 +93,7 @@ export function BookingForm({
   });
   const [attempted, setAttempted] = useState(false);
 
-  const clientErrors = attempted ? validate(values) : {};
+  const clientErrors = attempted ? validate(values, maxDate) : {};
   const errors: Errors =
     serverError && Object.keys(clientErrors).length === 0
       ? { [serverError.field]: serverError.message }
@@ -100,7 +105,7 @@ export function BookingForm({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setAttempted(true);
-    if (Object.keys(validate(values)).length > 0) {
+    if (Object.keys(validate(values, maxDate)).length > 0) {
       onInvalid?.();
       return;
     }
@@ -168,6 +173,7 @@ export function BookingForm({
             value={values.pickup}
             onChange={update('pickup')}
             minDate={startOfDay(new Date())}
+            maxDate={maxDate}
             rangeStart={values.pickup}
             rangeEnd={values.returnAt}
             invalid={Boolean(errors.pickup)}
@@ -185,6 +191,7 @@ export function BookingForm({
             value={values.returnAt}
             onChange={update('returnAt')}
             minDate={pickupDate ?? undefined}
+            maxDate={maxDate}
             rangeStart={values.pickup}
             rangeEnd={values.returnAt}
             invalid={Boolean(errors.returnAt)}

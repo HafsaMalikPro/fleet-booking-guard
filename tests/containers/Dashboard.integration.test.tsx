@@ -55,11 +55,12 @@ describe('Dashboard (integration with the real composition root)', () => {
     // Book the Sprinter 20 days out: beyond the first 14-day window.
     await user.click(screen.getByLabelText('Car'));
     await user.click(screen.getByRole('option', { name: /mercedes sprinter/i }));
-    for (const field of ['Pickup', 'Return'] as const) {
-      await user.click(screen.getByLabelText(field));
-      await user.keyboard('{ArrowDown}{ArrowDown}{ArrowRight>5/}'); // +19 days
-      await user.keyboard('{Enter}{Escape}');
-    }
+    await user.click(screen.getByLabelText('Pickup'));
+    await user.keyboard('{ArrowDown}{ArrowDown}{ArrowRight>5/}'); // +19 days: Oct 29
+    await user.keyboard('{Enter}{Escape}');
+    // The return picker opens on the pickup day; bookings must end within the month.
+    await user.click(screen.getByLabelText('Return'));
+    await user.keyboard('{ArrowRight}{Enter}{Escape}'); // Oct 30
     await user.click(screen.getByRole('button', { name: /check & book/i }));
 
     expect(await screen.findByText('Booking confirmed')).toBeInTheDocument();

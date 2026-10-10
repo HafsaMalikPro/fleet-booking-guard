@@ -1,5 +1,6 @@
 'use client';
 
+import { endOfMonth } from 'date-fns';
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { AcceptAlternative } from '@/src/application/use-cases/AcceptAlternative';
 import { CreateBooking } from '@/src/application/use-cases/CreateBooking';
@@ -35,11 +36,13 @@ export function createFleetServices(now: Date): FleetServices {
   const fleet = new InMemoryFleetRepository(seed.cars);
   const bookings = new InMemoryBookingRepository(seed.bookings);
   const ledger = new InMemoryRevenueLedger();
-  const findAlternatives = new FindAlternatives(fleet, bookings);
+  // Bookings are limited to the current month, the same span the timeline shows.
+  const latestEnd = endOfMonth(now);
+  const findAlternatives = new FindAlternatives(fleet, bookings, latestEnd);
   return {
     getFleetCalendar: new GetFleetCalendar(fleet, bookings),
     getFleetSummary: new GetFleetSummary(fleet, bookings, ledger),
-    createBooking: new CreateBooking(fleet, bookings, ledger, findAlternatives),
+    createBooking: new CreateBooking(fleet, bookings, ledger, findAlternatives, latestEnd),
     acceptAlternative: new AcceptAlternative(fleet, bookings, ledger),
     getRevenueProtected: new GetRevenueProtected(fleet, ledger),
   };

@@ -29,6 +29,8 @@ export interface DateTimePickerProps {
   onChange: (value: string) => void;
   /** Days before this one can't be picked. */
   minDate?: Date;
+  /** Days after this one can't be picked. */
+  maxDate?: Date;
   /** Trip span drawn behind the days, so both pickers show the whole rental. */
   rangeStart?: string;
   rangeEnd?: string;
@@ -68,6 +70,7 @@ export function DateTimePicker({
   value,
   onChange,
   minDate,
+  maxDate,
   rangeStart,
   rangeEnd,
   invalid = false,
@@ -89,14 +92,17 @@ export function DateTimePicker({
   const start = parseValue(rangeStart);
   const end = parseValue(rangeEnd);
   const minDay = minDate ? startOfDay(minDate) : null;
+  const maxDay = maxDate ? startOfDay(maxDate) : null;
   const time = selected ? format(selected, 'HH:mm') : '10:00';
   const slots = TIME_SLOTS.includes(time) ? TIME_SLOTS : [...TIME_SLOTS, time].sort();
 
-  const isDisabled = (day: Date) => (minDay ? isBefore(day, minDay) : false);
+  const isDisabled = (day: Date) =>
+    (minDay ? isBefore(day, minDay) : false) || (maxDay ? isAfter(day, maxDay) : false);
 
   function openPicker() {
     const preferred = startOfDay(selected ?? new Date());
-    const anchor = minDay && isBefore(preferred, minDay) ? minDay : preferred;
+    let anchor = minDay && isBefore(preferred, minDay) ? minDay : preferred;
+    if (maxDay && isAfter(anchor, maxDay)) anchor = maxDay;
     setMonth(startOfMonth(anchor));
     setFocused(anchor);
     keyboardNav.current = true; // move focus onto the selected day
@@ -184,6 +190,7 @@ export function DateTimePicker({
 
   const days = monthGrid(month);
   const prevDisabled = minDay ? !isAfter(month, startOfMonth(minDay)) : false;
+  const nextDisabled = maxDay ? !isBefore(month, startOfMonth(maxDay)) : false;
 
   return (
     <div ref={rootRef} className={cn('relative', className)}>
@@ -235,8 +242,9 @@ export function DateTimePicker({
               <button
                 type="button"
                 onClick={() => setMonth((m) => addMonths(m, 1))}
+                disabled={nextDisabled}
                 aria-label="Next month"
-                className="focus-ring inline-flex h-8 w-8 items-center justify-center rounded-full text-ink/70 transition-colors hover:bg-brand-50 hover:text-brand-600"
+                className="focus-ring inline-flex h-8 w-8 items-center justify-center rounded-full text-ink/70 transition-colors hover:bg-brand-50 hover:text-brand-600 disabled:pointer-events-none disabled:opacity-30"
               >
                 <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </button>
